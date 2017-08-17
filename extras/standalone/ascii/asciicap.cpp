@@ -7,7 +7,7 @@ Requires: OpenCV
 */
 
 #include <opencv2/opencv.hpp>
-#include <CYE_Images_v1.h>
+#include <CenteyeImages.h>
 
 static const int W = 80;
 static const int H = 60;

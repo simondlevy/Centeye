@@ -4,16 +4,18 @@
 #
 # Requires: OpenCV
 
+SRC = ../../../src
+
 all: asciicap
 
-asciicap: asciicap.o CYE_Images_v1.o
-	g++  -g -o asciicap  asciicap.o CYE_Images_v1.o `pkg-config opencv --libs`
+asciicap: asciicap.o CenteyeImages.o
+	g++  -g -o asciicap  asciicap.o CenteyeImages.o `pkg-config opencv --libs`
 
-asciicap.o: asciicap.cpp ../CYE_Images_v1.h Makefile
-	g++  -Wall -I.. -c asciicap.cpp  `pkg-config opencv --cflags`
+asciicap.o: asciicap.cpp $(SRC)/CenteyeImages.h Makefile
+	g++  -Wall -I$(SRC) -c asciicap.cpp  `pkg-config opencv --cflags`
 
-CYE_Images_v1.o: ../CYE_Images_v1.cpp ../CYE_Images_v1.h Makefile
-	g++  -Wall -c ../CYE_Images_v1.cpp
+CenteyeImages.o: $(SRC)/CenteyeImages.cpp $(SRC)/CenteyeImages.h Makefile
+	g++  -Wall -c $(SRC)/CenteyeImages.cpp
 
 clean:
 	rm -rf asciicap *.o *~ 

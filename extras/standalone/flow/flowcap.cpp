@@ -12,7 +12,7 @@ Requires: OpenCV
 #include <stdio.h>
 #include <string.h>
 
-#include <ArduEye_OFO.h>
+#include <CenteyeOpticalFlow.h>
 
 static const uint8_t  SCALEDOWN = 8;
 
