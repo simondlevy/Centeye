@@ -72,33 +72,6 @@
 //==============================================================================
 // GLOBAL VARIABLES
 
-#if defined(__AVR_ATmega2560__)  
-//uno can handle 19x19 array and FPN mask
-//so we set SKIP_PIXELS=4 to downsample by 4
-//and START_PIXELS to 18 to center the resulting
-//76x76 raw grid on the Stonyman raw 112x112 array.
-if defined (__AVR_ATmega8__)||(__AVR_ATmega168__)|(__AVR_ATmega168P__)||(__AVR_ATmega328P__)
-#define MAX_ROWS 19    
-#define MAX_COLS 19
-#define MAX_PIXELS (MAX_ROWS*MAX_COLS)
-#define SKIP_PIXELS 4
-#define START_PIXEL 18
-
-#else 
-//If not Uno, assume a more modern board like Mega 2560,
-//which can handle 48x48 array and FPN mask
-//so we set SKIP_PIXELS=2 to downsample by 2
-//and START_PIXELS at row/col 8.  This gives us
-//a 48x48 array with superpixels of 2x2.  With the
-//start row and col at 8, the 96x96 raw grid is 
-//centered on the Stonyman 112x112 raw array.
-#define MAX_ROWS 48
-#define MAX_COLS 48
-#define MAX_PIXELS (MAX_ROWS*MAX_COLS)
-#define SKIP_PIXELS 2
-#define START_PIXEL 8  
-#endif
-
 // pins
 #define RESP   3
 #define INCP   4
