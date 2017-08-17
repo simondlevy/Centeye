@@ -7,7 +7,7 @@ The <b>examples</b> folder contains the following sketches:
 <li> <b>Tester</b>: simple serial-monitor interaction, providing Matlab-formatted output
 <li> <b>GUI</b>: works with the GUI program in <b>extras/processing</b> to display live streaming images
 <li> <b>Flow</b>: works with the GUI program in <b>extras/processing</b> to display optical flow
-<ul>
+</ul>
 
 The <b>extras</b> folder contains:
 <ul>
@@ -16,5 +16,5 @@ The <b>extras</b> folder contains:
 <a href="https://processing.org/">Processing</a>
 <li> <b>python</b> a Python program <b>snapshot.py</b> that works with the example in <b>examples/Tester</b>
 <li> <b>standalone</b> standalone C++ programs (not requiring Stonyman) for optical flow and ASCII imaging
-<ul>
+</ul>
 
