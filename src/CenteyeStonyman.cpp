@@ -397,7 +397,8 @@ void ArduEyeSMH::getImage(short *img,
         uint8_t colstart, 
         uint8_t numcols, 
         uint8_t colskip, 
-        char ADCType,char ANALOG) 
+        char ADCType,
+        char ANALOG) 
 {
     (void)ADCType;
 
@@ -467,7 +468,16 @@ void ArduEyeSMH::getImage(short *img,
 //	8x8 binning. Grab from input 2.
 /*********************************************************************/
 
-void ArduEyeSMH::getImageRowSum(short *img, uint8_t rowstart, uint8_t numrows, uint8_t rowskip, uint8_t colstart, uint8_t numcols, uint8_t colskip, char ADCType,char ANALOG) 
+void ArduEyeSMH::getImageRowSum(
+        short *img, 
+        uint8_t rowstart, 
+        uint8_t numrows, 
+        uint8_t rowskip, 
+        uint8_t colstart, 
+        uint8_t numcols, 
+        uint8_t colskip, 
+        char ADCType,
+        char ANALOG) 
 {
     short *pimg = img; // pointer to output image array
     short val,total=0;
@@ -544,7 +554,16 @@ void ArduEyeSMH::getImageRowSum(short *img, uint8_t rowstart, uint8_t numrows, u
 //	8x8 binning. Grab from input 2.
 /*********************************************************************/
 
-void ArduEyeSMH::getImageColSum(short *img, uint8_t rowstart, uint8_t numrows, uint8_t rowskip, uint8_t colstart, uint8_t numcols, uint8_t colskip, char ADCType,char ANALOG) 
+void ArduEyeSMH::getImageColSum(
+        short *img, 
+        uint8_t rowstart, 
+        uint8_t numrows, 
+        uint8_t rowskip, 
+        uint8_t colstart, 
+        uint8_t numcols, 
+        uint8_t colskip, 
+        char ADCType,
+        char ANALOG) 
 {
     short *pimg = img; // pointer to output image array
     short val,total=0;

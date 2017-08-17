@@ -219,22 +219,65 @@ class ArduEyeSMH
         void applyMask(short *img, short size, uint8_t *mask, short mask_base);
 
         //gets an image from the vision chip
-        void getImage(short *img, uint8_t rowstart, uint8_t numrows, uint8_t rowskip, uint8_t colstart, unsigned 	char numcols, uint8_t colskip, char ADCType,char anain);
+        void getImage(
+                short *img, 
+                uint8_t rowstart, 
+                uint8_t numrows, 
+                uint8_t rowskip, 
+                uint8_t colstart, 
+                uint8_t numcols, 
+                uint8_t colskip, 
+                char ADCType,
+                char anain);
 
         //gets a image from the vision chip, sums each row and returns one pixel for the row
-        void getImageRowSum(short *img, uint8_t rowstart, uint8_t numrows, uint8_t rowskip, uint8_t colstart, unsigned 	char numcols, uint8_t colskip, char ADCType,char anain);
+        void getImageRowSum(
+                short *img, 
+                uint8_t rowstart, 
+                uint8_t numrows, 
+                uint8_t rowskip, 
+                uint8_t colstart, 
+                uint8_t numcols, 
+                uint8_t colskip, 
+                char ADCType,
+                char anain);
 
         //gets a image from the vision chip, sums each col and returns one pixel for the col
-        void getImageColSum(short *img, uint8_t rowstart, uint8_t numrows, uint8_t rowskip, uint8_t colstart, unsigned 	char numcols, uint8_t colskip, char ADCType,char anain);
+        void getImageColSum(short *img, 
+                uint8_t rowstart, 
+                uint8_t numrows, 
+                uint8_t rowskip, 
+                uint8_t colstart, 
+                uint8_t numcols, 
+                uint8_t colskip, 
+                char ADCType,char anain);
 
         //takes an image and returns the maximum value row and col
-        void findMax(uint8_t rowstart, uint8_t numrows, uint8_t rowskip, uint8_t colstart, uint8_t numcols, uint8_t colskip, char ADCType,char anain,uint8_t *max_row, uint8_t *max_col);
+        void findMax(
+                uint8_t rowstart, 
+                uint8_t numrows, 
+                uint8_t rowskip, 
+                uint8_t colstart, 
+                uint8_t numcols, 
+                uint8_t colskip, 
+                char ADCType,
+                char anain,
+                uint8_t *max_row, 
+                uint8_t *max_col);
 
         //prints the entire vision chip over serial as a Matlab array
         void chipToMatlab(char whichchip,char ADCType,char anain);
 
         //prints a section of the vision chip over serial as a Matlab array
-        void sectionToMatlab(uint8_t rowstart, uint8_t numrows, uint8_t rowskip, uint8_t colstart, uint8_t numcols, uint8_t colskip, char ADCType, uint8_t 	anain);   
+        void sectionToMatlab(
+                uint8_t rowstart, 
+                uint8_t numrows, 
+                uint8_t rowskip, 
+                uint8_t colstart, 
+                uint8_t numcols, 
+                uint8_t colskip, 
+                char ADCType, 
+                uint8_t anain);   
 
 };
 
