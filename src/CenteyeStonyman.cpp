@@ -1,14 +1,6 @@
 #include "CenteyeStonyman.h"
 #include <SPI.h>	//SPI required for external ADC
 
-/*********************************************************************/
-//	begin
-//	Initializes the vision chips for normal operation.  Sets vision
-//	chip pins to low outputs, clears chip registers, sets biases and
-//	config register.  If no parameters are passed in, default values
-//	are used.
-/*********************************************************************/
-
 ArduEyeSMH::ArduEyeSMH(uint8_t resp, uint8_t incp, uint8_t resv, uint8_t incv, uint8_t inphi)
 {
     _resp = resp;
@@ -49,11 +41,6 @@ void ArduEyeSMH::begin(short vref,short nbias,short aobias, char selamp)
 
 }
 
-/*********************************************************************/
-//	setPointer
-//	Sets the pointer system register to the desired value
-/*********************************************************************/
-
 static void pulse(int pin)
 {
     digitalWrite(pin, HIGH);
@@ -71,11 +58,6 @@ void ArduEyeSMH::setPointer(char ptr)
         pulse(_incp);
 }
 
-/*********************************************************************/
-//	setValue
-//	Sets the value of the current register
-/*********************************************************************/
-
 void ArduEyeSMH::setValue(short val) 
 {
     // clear pointer
@@ -86,23 +68,11 @@ void ArduEyeSMH::setValue(short val)
         pulse(_incv);
 }
 
-/*********************************************************************/
-//	incValue
-//	Sets the pointer system register to the desired value.  Value is
-//	not reset so the current value must be taken into account
-/*********************************************************************/
-
 void ArduEyeSMH::incValue(short val) 
 {
     for (short i=0; i<val; ++i) //increment pointer
         pulse(_incv);
 }
-
-/*********************************************************************/
-//	pulseInphi
-//	Operates the amplifier.  Sets inphi pin high, delays to allow
-//	value time to settle, and then brings it low.
-/*********************************************************************/
 
 void ArduEyeSMH::pulseInphi(char delay) 
 {
@@ -110,22 +80,11 @@ void ArduEyeSMH::pulseInphi(char delay)
     pulse(_inphi);
 }
 
-/*********************************************************************/
-//	setPointerValue
-//	Sets the pointer to a register and sets the value of that        
-//	register
-/*********************************************************************/
-
 void ArduEyeSMH::setPointerValue(char ptr,short val)
 {
     setPointer(ptr);	//set pointer to register
     setValue(val);	//set value of that register
 }
-
-/*********************************************************************/
-//	clearValues
-//	Resets the value of all registers to zero
-/*********************************************************************/
 
 void ArduEyeSMH::clearValues(void)
 {
@@ -133,40 +92,20 @@ void ArduEyeSMH::clearValues(void)
         setPointerValue(i,0);	//set each register to zero
 }
 
-/*********************************************************************/
-//	setVREF
-//	Sets the VREF register value (0-63)
-/*********************************************************************/
-
 void  ArduEyeSMH::setVREF(short vref)
 {
     setPointerValue(SMH_SYS_VREF,vref);
 }
-
-/*********************************************************************/
-//	setNBIAS
-//	Sets the NBIAS register value (0-63)
-/*********************************************************************/
 
 void  ArduEyeSMH::setNBIAS(short nbias)
 {
     setPointerValue(SMH_SYS_NBIAS,nbias);
 }
 
-/*********************************************************************/
-//	setAOBIAS
-//	Sets the AOBIAS register value (0-63)
-/*********************************************************************/
-
 void  ArduEyeSMH::setAOBIAS(short aobias)
 {
     setPointerValue(SMH_SYS_AOBIAS,aobias);
 }
-
-/*********************************************************************/
-//	setBiasesVdd
-//	Sets biases based on chip voltage
-/*********************************************************************/
 
 void ArduEyeSMH::setBiasesVdd(char vddType)
 {
@@ -183,29 +122,12 @@ void ArduEyeSMH::setBiasesVdd(char vddType)
     }
 }
 
-/*********************************************************************/
-//	setBiases
-//	Sets all three biases
-/*********************************************************************/
-
 void ArduEyeSMH::setBiases(short vref,short nbias,short aobias)
 {
     setPointerValue(SMH_SYS_NBIAS,nbias);
     setPointerValue(SMH_SYS_AOBIAS,aobias);
     setPointerValue(SMH_SYS_VREF,vref);
 }
-
-/*********************************************************************/
-//	setConfig
-//	Sets configuration register
-//	cvdda:  (1) connect vdda, always should be connected
-//	selamp: (0) bypasses amplifier, (1) connects it
-//	gain: amplifier gain 1-7
-//	EXAMPLE 1: To configure the chip to bypass the amplifier:
-//	setConfig(0,0,1);
-//	EXAMPLE 2: To use the amplifier and set the gain to 4:
-//	setConfig(4,1,1);
-/*********************************************************************/
 
 void ArduEyeSMH::setConfig(char gain, char selamp, char cvdda) 
 {
@@ -221,13 +143,6 @@ void ArduEyeSMH::setConfig(char gain, char selamp, char cvdda)
     // Note that there is no overflow detection in the input values.
     setPointerValue(SMH_SYS_CONFIG,config);
 }
-
-/*********************************************************************/
-//	setAmpGain
-//	A friendlier version of setConfig.  If amplifier gain is set to 
-//	zero, amplifier is bypassed.  Otherwise the appropriate amplifier
-//	gain (range 1-7) is set.
-/*********************************************************************/
 
 void ArduEyeSMH::setAmpGain(char gain)
 {
@@ -247,23 +162,10 @@ void ArduEyeSMH::setAmpGain(char gain)
     setPointerValue(SMH_SYS_CONFIG,config);	//set config register
 }
 
-/*********************************************************************/
-//	setAnalogInput
-//	Sets the analog pin for one vision chip to be an input.
-//	This is for the Arduino onboard ADC, not an external ADC
-/*********************************************************************/
-
 void ArduEyeSMH::setAnalogInput(char analogInput)
 {
     (void)analogInput;
 }
-
-/*********************************************************************/
-//	setADCInput
-//	Sets the analog pin to be a digital output and select a chip
-//	to connect to the external ADC.  The state can be used to
-//	deselect a particular chip as well.
-/*********************************************************************/
 
 void ArduEyeSMH::setADCInput(char ADCInput,char state)
 {
@@ -271,17 +173,6 @@ void ArduEyeSMH::setADCInput(char ADCInput,char state)
     (void)state;
 
 }
-
-/*********************************************************************/
-//	setBinning
-//	Configures binning in the focal plane using the VSW and HSW
-//	system registers. The super pixels are aligned with the top left 
-//	of the image, e.g. "offset downsampling" is not used. This 
-//	function is for the Stonyman chip only. 
-//	VARIABLES:
-//	hbin: set to 1, 2, 4, or 8 to bin horizontally by that amount
-//	vbin: set to 1, 2, 4, or 8 to bin vertically by that amount
-/*********************************************************************/
 
 void ArduEyeSMH::setBinning(short hbin,short vbin)
 {
@@ -322,17 +213,6 @@ void ArduEyeSMH::setBinning(short hbin,short vbin)
     setPointerValue(SMH_SYS_VSW,vsw);
 }
 
-/*********************************************************************/
-//	calcMask
-//	Expose the vision chip to uniform texture (such as a white piece
-//	of paper placed over the optics).  Take an image using the 
-//	getImage function.  Pass the short "img" array and the "size"
-//	number of pixels, along with a uint8_t "mask" array to hold
-//	the FPN mask and mask_base for the FPN mask base.  Function will
-//	populate the mask array and mask_base variable with the FPN mask,
-//	which can then be used with the applMask function. 
-/*********************************************************************/
-
 void ArduEyeSMH::calcMask(short *img, short size, uint8_t *mask,short *mask_base)
 {
     *mask_base = 10000; // e.g. "high"
@@ -346,13 +226,6 @@ void ArduEyeSMH::calcMask(short *img, short size, uint8_t *mask,short *mask_base
         mask[i] = img[i] - *mask_base;	//subtract min value for mask
 }
 
-/*********************************************************************/
-//	applyMask
-//	given the "mask" and "mask_base" variables calculated in        
-//	calcMask, and a current image, this function will subtract the
-//	mask to provide a calibrated image.
-/*********************************************************************/
-
 void ArduEyeSMH::applyMask(short *img, short size, uint8_t *mask, short mask_base)
 {
     // Subtract calibration mask
@@ -362,33 +235,6 @@ void ArduEyeSMH::applyMask(short *img, short size, uint8_t *mask, short mask_bas
         img[i]=-img[i];          //negate image so it displays properly
     }
 }
-
-/*********************************************************************/
-//	getImage
-//	This function acquires a box section of a Stonyman or Hawksbill 
-//	and saves to image array img.  Note that images are read out in 
-//	raster manner (e.g. row wise) and stored as such in a 1D array. 
-//	In this case the pointer img points to the output array. 
-//
-//	VARIABLES: 
-//	img (output): pointer to image array, an array of signed shorts
-//	rowstart: first row to acquire
-//	numrows: number of rows to acquire
-//	rowskip: skipping between rows (useful if binning is used)
-//	colstart: first column to acquire
-//	numcols: number of columns to acquire
-//	colskip: skipping between columns
-//	ADCType: which ADC to use, defined ADC_TYPES
-//	ANALOG (0,1,2,3): which analog input to use
-//	
-//	EXAMPLES:
-//	getImage(img,16,8,1,24,8,1,SMH1_ADCTYPE_ONBOARD,0): 
-//	Grab an 8x8 window of pixels at raw resolution starting at row 
-//	16, column 24, from chip using onboard ADC at input 0
-//	getImage(img,0,14,8,0,14,8,SMH1_ADCTYPE_MCP3201,2): 
-//	Grab entire Stonyman chip when using
-//	8x8 binning. Grab from input 2.
-/*********************************************************************/
 
 void ArduEyeSMH::getImage(short *img, 
         uint8_t rowstart, 
@@ -438,35 +284,6 @@ void ArduEyeSMH::getImage(short *img,
         incValue(rowskip); // go to next row
     }
 }
-
-/*********************************************************************/
-//	getImageRowSum
-//	This function acquires a box section of a Stonyman or Hawksbill 
-//	and saves to image array img.  However, each row of the image
-//	is summed and returned as a single value.
-//	Note that images are read out in 
-//	raster manner (e.g. row wise) and stored as such in a 1D array. 
-//	In this case the pointer img points to the output array. 
-//
-//	VARIABLES: 
-//	img (output): pointer to image array, an array of signed shorts
-//	rowstart: first row to acquire
-//	numrows: number of rows to acquire
-//	rowskip: skipping between rows (useful if binning is used)
-//	colstart: first column to acquire
-//	numcols: number of columns to acquire
-//	colskip: skipping between columns
-//	ADCType: which ADC to use, defined ADC_TYPES
-//	ANALOG (0,1,2,3): which analog input to use
-//	
-//	EXAMPLES:
-//	getImage(img,16,8,1,24,8,1,SMH1_ADCTYPE_ONBOARD,0): 
-//	Grab an 8x8 window of pixels at raw resolution starting at row 
-//	16, column 24, from chip using onboard ADC at input 0
-//	getImage(img,0,14,8,0,14,8,SMH1_ADCTYPE_MCP3201,2): 
-//	Grab entire Stonyman chip when using
-//	8x8 binning. Grab from input 2.
-/*********************************************************************/
 
 void ArduEyeSMH::getImageRowSum(
         short *img, 
@@ -525,35 +342,6 @@ void ArduEyeSMH::getImageRowSum(
 
 }
 
-/*********************************************************************/
-//	getImageColSum
-//	This function acquires a box section of a Stonyman or Hawksbill 
-//	and saves to image array img.  However, each col of the image
-//	is summed and returned as a single value.
-//	Note that images are read out in 
-//	raster manner (e.g. row wise) and stored as such in a 1D array. 
-//	In this case the pointer img points to the output array. 
-//
-//	VARIABLES: 
-//	img (output): pointer to image array, an array of signed shorts
-//	rowstart: first row to acquire
-//	numrows: number of rows to acquire
-//	rowskip: skipping between rows (useful if binning is used)
-//	colstart: first column to acquire
-//	numcols: number of columns to acquire
-//	colskip: skipping between columns
-//	ADCType: which ADC to use, defined ADC_TYPES
-//	ANALOG (0,1,2,3): which analog input to use
-//	
-//	EXAMPLES:
-//	getImage(img,16,8,1,24,8,1,SMH1_ADCTYPE_ONBOARD,0): 
-//	Grab an 8x8 window of pixels at raw resolution starting at row 
-//	16, column 24, from chip using onboard ADC at input 0
-//	getImage(img,0,14,8,0,14,8,SMH1_ADCTYPE_MCP3201,2): 
-//	Grab entire Stonyman chip when using
-//	8x8 binning. Grab from input 2.
-/*********************************************************************/
-
 void ArduEyeSMH::getImageColSum(
         short *img, 
         uint8_t rowstart, 
@@ -611,34 +399,6 @@ void ArduEyeSMH::getImageColSum(
 
 }
 
-
-/*********************************************************************/
-//	findMax
-//	Searches over a block section of a Stonyman or Hawksbill chip
-//	to find the brightest pixel. This function is intended to be used 
-//	for things like finding the location of a pinhole in response to 
-//	a bright light.
-//
-//	VARIABLES: 
-//	rowstart: first row to search
-//	numrows: number of rows to search
-//	rowskip: skipping between rows (useful if binning is used)
-//	colstart: first column to search
-//	numcols: number of columns to search
-//	colskip: skipping between columns
-//	ADCType: which ADC to use, defined ADC_TYPES
-//	ANALOG (0,1,2,3): which analog input to use
-//	rowwinner: (output) pointer to variable to write row of brightest 
-//	pixel
-//	colwinner: (output) pointer to variable to write column of 
-//	brightest pixel
-//
-//	EXAMPLE:
-//	FindMaxSlow(8,104,1,8,104,1,SMH1_ADCTYPE_ONBOARD,0,&rowwinner,
-//	&colwinner): 
-//	Search rows 8...104 and columns 8...104 for brightest pixel, with 
-//	onboard ADC, chip 0
-/*********************************************************************/
 
 void ArduEyeSMH::findMax(
         uint8_t rowstart, 
@@ -708,26 +468,9 @@ void ArduEyeSMH::findMax(
     if(ADCType!=SMH1_ADCTYPE_ONBOARD)
         setADCInput(ANALOG,0); // disable chip
 
-    // Optionally we can comment out these next three items
-    //Serial.print("bestrow = "); Serial.println((short)bestrow);
-    //Serial.print("bestcol = "); Serial.println((short)bestcol);
-    //Serial.print("maxval = "); Serial.println((short)maxval);
-
     *max_row = bestrow;
     *max_col = bestcol;
 }
-
-/*********************************************************************/
-//	chipToMatlab
-//	This function dumps the entire contents of a Stonyman or 
-//	Hawksbill chip to the Serial monitor in a form that may be copied 
-//	into Matlab. The image is written be stored in matrix Img. 
-//
-//	VARIABLES: 
-//	whichchip(0 or 1): 0 for Stonyman, 1 for Hawksbill
-//	ADCType: which ADC to use, defined ADC_TYPES
-//	ANALOG (0,1,2,3): Selects one analog input
-/*********************************************************************/
 
 void ArduEyeSMH::chipToMatlab(char whichchip,char ADCType, char ANALOG) 
 {
@@ -770,31 +513,6 @@ void ArduEyeSMH::chipToMatlab(char whichchip,char ADCType, char ANALOG)
         setADCInput(ANALOG,0); // disable chip
 
 }
-
-/*********************************************************************/
-//	sectionToMatlab
-//	This function dumps a box section of a Stonyman or Hawksbill 
-//	to the Serial monitor in a form that may be copied into Matlab. 
-//	The image is written to be stored in matrix Img. 
-//
-//	VARIABLES: 
-//	rowstart: first row to acquire
-//	numrows: number of rows to acquire
-//	rowskip: skipping between rows (useful if binning is used)
-//	colstart: first column to acquire
-//	numcols: number of columns to acquire
-//	colskip: skipping between columns
-//	ADCType: which ADC to use, defined ADC_TYPES
-//	ANALOG (0,1,2,3): which analog input to use
-//
-//	EXAMPLES:
-//	sectionToMatlab(16,8,1,24,8,1,SMH1_ADCTYPE_ONBOARD,0): 
-//	Grab an 8x8 window of pixels at raw resolution starting at row 
-//	16, column 24, from onboard ADC at chip 0
-//	sectionToMatlab(0,14,8,0,14,8,SMH1_ADCTYPE_ONBOARD,2): 
-//	Grab entire Stonyman chip when using 8x8 binning. Grab from input 
-//	2.
-/*********************************************************************/
 
 void ArduEyeSMH::sectionToMatlab(
         uint8_t rowstart, 
