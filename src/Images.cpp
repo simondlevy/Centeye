@@ -1,73 +1,61 @@
 /*
-CYE_Images_v1.c
+   Images.cpp Basic functions to handle images
 
-Basic functions to handle images
+   Copyright (c) 2012 Centeye, Inc. 
+   All rights reserved.
 
-Working revision started November 19, 2011
-November 29, 2011: Renamed. Functions renamed substantially
-January 21, 2012: renamed to _v1
-January 22, 2012: initial release
-February 17, 2012: includes Arduino.h or WProgram.h depending on Arduino IDE version
-*/
-/*
-===============================================================================
-Copyright (c) 2012 Centeye, Inc. 
-All rights reserved.
+   Redistribution and use in source and binary forms, with or without 
+   modification, are permitted provided that the following conditions are met:
 
-Redistribution and use in source and binary forms, with or without 
-modification, are permitted provided that the following conditions are met:
+   Redistributions of source code must retain the above copyright notice, 
+   this list of conditions and the following disclaimer.
 
-Redistributions of source code must retain the above copyright notice, 
-this list of conditions and the following disclaimer.
-    
-Redistributions in binary form must reproduce the above copyright notice, 
-this list of conditions and the following disclaimer in the documentation 
-and/or other materials provided with the distribution.
+   Redistributions in binary form must reproduce the above copyright notice, 
+   this list of conditions and the following disclaimer in the documentation 
+   and/or other materials provided with the distribution.
 
-THIS SOFTWARE IS PROVIDED BY CENTEYE, INC. ``AS IS'' AND ANY EXPRESS OR 
-IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
-MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO 
-EVENT SHALL CENTEYE, INC. OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
-INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
-BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   THIS SOFTWARE IS PROVIDED BY CENTEYE, INC. ``AS IS'' AND ANY EXPRESS OR 
+   IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO 
+   EVENT SHALL CENTEYE, INC. OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
+   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+   BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+   OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
+   EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-The views and conclusions contained in the software and documentation are 
-those of the authors and should not be interpreted as representing official 
-policies, either expressed or implied, of Centeye, Inc.
-===============================================================================
-*/
-/* NOTES ON IMAGE LIBRARY
-Generally images are stored as either signed shorts (16 bits), signed chars (8 bits), or unsigned chars (8 bits). 
-Signed numbers are generally preferred to allow for negative values due to frame differences. 8 bits is adequate
-for some applications in particular when bit depth is not needed and/or speed and memory is a consideration. 
+   The views and conclusions contained in the software and documentation are 
+   those of the authors and should not be interpreted as representing official 
+   policies, either expressed or implied, of Centeye, Inc.
+   ===============================================================================
 
-Although images are generally accepted as two dimensional arrays, for this library they are stored in a
-one dimensional array row-wise. So to store a 4x6 image, we would first declare a variable:
+   Generally images are stored as either signed shorts (16 bits), signed chars (8 bits), or unsigned chars (8 bits). 
+   Signed numbers are generally preferred to allow for negative values due to frame differences. 8 bits is adequate
+   for some applications in particular when bit depth is not needed and/or speed and memory is a consideration. 
 
-    short A[24]; // 24 = 4 rows * 6 columns
-    
-and then store the first row in the first six elements of A, the second row in the second six elements of A,
-and so on. So A[0] = row 0 column 0, A[1] = row 0 column 1, A[5] = row 0 column 5, A[6] = row 1 column 0,
-A[11] = row 1 column 5, etc. This row-wise format speeds up acquisition of pixels, in particular if pointer
-are used for different arrays, or even for different regions within the same region. Note that it is up to 
-the programmer to ensure that arrays are properly allocated and that indices do not go out of bounds.
+   Although images are generally accepted as two dimensional arrays, for this library they are stored in a
+   one dimensional array row-wise. So to store a 4x6 image, we would first declare a variable:
 
-The image functions are then written so that you will need to provide either the number of rows and columns,
-or just the total number of pixels (number of rows * number of columns). This is because some functions
-(like direct frame adding or finding the maximum or minimum values in an image) don't require knowledge
-of the row or column of each pixel, whereas other functions (like printing images or more advanced
-operations) do require the dimensions of the image.
+   short A[24]; // 24 = 4 rows * 6 columns
 
-Hexagonal images are a special case and will be discussed here soon. (More text to be added soon...)
+   and then store the first row in the first six elements of A, the second row in the second six elements of A,
+   and so on. So A[0] = row 0 column 0, A[1] = row 0 column 1, A[5] = row 0 column 5, A[6] = row 1 column 0,
+   A[11] = row 1 column 5, etc. This row-wise format speeds up acquisition of pixels, in particular if pointer
+   are used for different arrays, or even for different regions within the same region. Note that it is up to 
+   the programmer to ensure that arrays are properly allocated and that indices do not go out of bounds.
 
-*/
+   The image functions are then written so that you will need to provide either the number of rows and columns,
+   or just the total number of pixels (number of rows * number of columns). This is because some functions
+   (like direct frame adding or finding the maximum or minimum values in an image) don't require knowledge
+   of the row or column of each pixel, whereas other functions (like printing images or more advanced
+   operations) do require the dimensions of the image.
+
+   Hexagonal images are a special case and will be discussed here soon. (More text to be added soon...)
+
+ */
 
 // Support both Arduino and standard C++
-
 #if defined(__arm__) || defined(__avr__)
 #include <Arduino.h>
 #define PRINTSHORT(n) Serial.print(n)
@@ -83,6 +71,8 @@ Hexagonal images are a special case and will be discussed here soon. (More text 
 #define PRINTSTR(s)   printf("%s ", s)
 #define RANDOM(m)     (random() % m)
 #endif
+
+#include "Images.h"
 
 //========================================================================
 // IMAGE BASICS AND MANIPULATION

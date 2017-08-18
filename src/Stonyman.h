@@ -1,15 +1,9 @@
 /*
-ArduEye_SMH_v1.h
-ArduEye Library for the Stonyman/Hawksbill Centeye Vision Chips
+Stonyman.h Library for the Stonyman Centeye Vision Chip
 
 Basic functions to operate Stonyman/Hawksbill with ArduEye boards
 Supports all Arduino boards that use the ATMega 8/168/328/2560
 NOTE: ATMega 2560 SPI for external ADC is not supported.
-
-Working revision started July 9, 2012
-
-
-
 
 Copyright (c) 2012 Centeye, Inc. 
 All rights reserved.

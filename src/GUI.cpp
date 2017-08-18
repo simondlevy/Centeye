@@ -1,54 +1,39 @@
-/*********************************************************************/
-/*********************************************************************/
-//	ArduEye_GUI_v1.c
-//	ArduEyeGUI Library to interface with the ArduEye processing GUI
-//	
-//	Functions to send data to the ArduEye processing GUI for display
-//	For example, send an image array to the GUI and have it display
-//	the image in the GUI window. A special serial command "!1" is
-//	sent from the GUI to enable all functions, so that a bunch of 
-//	unreadable data isn't sent to the serial monitor.
-//
-//	Working revision started July 9, 2012
-//
-/*********************************************************************/
-/*********************************************************************/
-
 /*
-===============================================================================
-Copyright (c) 2012 Centeye, Inc. 
-All rights reserved.
+   GUI.cpp
+   Centeye Library to interface with the Processing GUI
 
-Redistribution and use in source and binary forms, with or without 
-modification, are permitted provided that the following conditions are met:
+   Copyright (c) 2012 Centeye, Inc. 
+   All rights reserved.
 
-    Redistributions of source code must retain the above copyright notice, 
-    this list of conditions and the following disclaimer.
-    
-    Redistributions in binary form must reproduce the above copyright notice, 
-    this list of conditions and the following disclaimer in the documentation 
-    and/or other materials provided with the distribution.
+   Redistribution and use in source and binary forms, with or without 
+   modification, are permitted provided that the following conditions are met:
 
-THIS SOFTWARE IS PROVIDED BY CENTEYE, INC. ``AS IS'' AND ANY EXPRESS OR 
-IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
-MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO 
-EVENT SHALL CENTEYE, INC. OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
-INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
-BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   Redistributions of source code must retain the above copyright notice, 
+   this list of conditions and the following disclaimer.
 
-The views and conclusions contained in the software and documentation are 
-those of the authors and should not be interpreted as representing official 
-policies, either expressed or implied, of Centeye, Inc.
-===============================================================================
-*/
+   Redistributions in binary form must reproduce the above copyright notice, 
+   this list of conditions and the following disclaimer in the documentation 
+   and/or other materials provided with the distribution.
+
+   THIS SOFTWARE IS PROVIDED BY CENTEYE, INC. ``AS IS'' AND ANY EXPRESS OR 
+   IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO 
+   EVENT SHALL CENTEYE, INC. OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
+   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+   BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+   OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
+   EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+   The views and conclusions contained in the software and documentation are 
+   those of the authors and should not be interpreted as representing official 
+   policies, either expressed or implied, of Centeye, Inc.
+ */
 
 #include <Arduino.h>
 
-#include "CenteyeGUI.h"
+#include <GUI.h>
 
 //class instance to be referenced in sketch
 ArduEyeGUIClass ArduEyeGUI;
@@ -60,8 +45,8 @@ ArduEyeGUIClass ArduEyeGUI;
 
 ArduEyeGUIClass::ArduEyeGUIClass(void)
 {
-  // initialize this instance's variables
-  detected=0;	//arduGUI not detected
+    // initialize this instance's variables
+    detected=0;	//arduGUI not detected
 }
 
 /*********************************************************************/
@@ -71,7 +56,7 @@ ArduEyeGUIClass::ArduEyeGUIClass(void)
 
 void ArduEyeGUIClass::start(void)
 {
-  detected=1;	//GUI detected
+    detected=1;	//GUI detected
 }
 
 /*********************************************************************/
@@ -81,7 +66,7 @@ void ArduEyeGUIClass::start(void)
 
 void ArduEyeGUIClass::stop(void)
 {
-  detected=0;	//GUI not detected
+    detected=0;	//GUI not detected
 }
 
 /*********************************************************************/
@@ -96,24 +81,24 @@ void ArduEyeGUIClass::stop(void)
 
 void ArduEyeGUIClass::getCommand(char *command, int *argument) 
 {
-  char cmdbuf[11];
-  unsigned char i;
+    char cmdbuf[11];
+    unsigned char i;
 
-  // initialize
-  for (i=0; i<11; ++i)
-    cmdbuf[i] = 0;
-  i = 0;
-  // delay to ensure that all stuff is sent through serial port
-  delay(100);
-  // load cmdbuf
-  while (Serial.available() && i<10) {
-    cmdbuf[i] = Serial.read();
-    i++;
-  }
-  // clear end of array
-  cmdbuf[10]=0;
-  // clear rest of buffer
-  while (Serial.available())
+    // initialize
+    for (i=0; i<11; ++i)
+        cmdbuf[i] = 0;
+    i = 0;
+    // delay to ensure that all stuff is sent through serial port
+    delay(100);
+    // load cmdbuf
+    while (Serial.available() && i<10) {
+        cmdbuf[i] = Serial.read();
+        i++;
+    }
+    // clear end of array
+    cmdbuf[10]=0;
+    // clear rest of buffer
+    while (Serial.available())
     ;
   // get command
   *command = cmdbuf[0];

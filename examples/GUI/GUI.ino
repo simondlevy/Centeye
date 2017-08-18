@@ -55,8 +55,8 @@
 // INCLUDE FILES. The top two files are part of the ArduEye library and should
 // be included in the Arduino "libraries" folder.
 
-#include <CenteyeStonyman.h>  //Stonyman/Hawksbill vision chip library
-#include <CenteyeGUI.h>  //ArduEye processing GUI interface
+#include <Stonyman.h>  // Stonyman vision chip library
+#include <GUI.h>       // ArduEye processing GUI interface
 
 #include <SPI.h>  //SPI library is needed to use an external ADC
 //not supported for MEGA 2560

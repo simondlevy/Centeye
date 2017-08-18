@@ -1,5 +1,7 @@
 /*
 ===============================================================================
+Images.h Basic functions to handle images
+
 Copyright (c) 2012 Centeye, Inc. 
 All rights reserved.
 

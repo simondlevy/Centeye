@@ -1,17 +1,6 @@
-/*********************************************************************/
-/*********************************************************************/
-//	ArduEye_OFO_v1.h
-//	ArduEyeOFO Library provides optical flow algorithms
-//	
-//	Functions to calculate optical flow and odometry
-//
-//	Working revision started July 9, 2012
-//
-/*********************************************************************/
-/*********************************************************************/
-
 /*
-===============================================================================
+OpticalFlow.cpp Functions to calculate optical flow and odometry
+
 Copyright (c) 2012 Centeye, Inc. 
 All rights reserved.
 
@@ -39,24 +28,10 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 The views and conclusions contained in the software and documentation are 
 those of the authors and should not be interpreted as representing official 
 policies, either expressed or implied, of Centeye, Inc.
-===============================================================================
-*/
-/* 
-Change log:
-July 10, 2012: initial release
-
 */
 
 #ifndef ARDUEYE_OFO_H
 #define ARDUEYE_OFO_H
-
-/*********************************************************************/
-/*********************************************************************/
-/*********************************************************************/
-/*********************************************************************/
-//	ArduEyeOFOClass
-/*********************************************************************/
-/*********************************************************************/
 
 // Low Pass Filters an OF value with coefficient alpha
 void LPF(short *filtered_OF,short *new_OF,float alpha);
