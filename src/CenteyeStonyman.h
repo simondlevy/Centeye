@@ -72,18 +72,6 @@ policies, either expressed or implied, of Centeye, Inc.
 #define SMH_SELAMP_DEFAULT 0	//amp bypassed
 
 /*********************************************************************/
-// ADC types
-
-// ARDUINO ONBOARD ADC
-#define SMH1_ADCTYPE_ONBOARD 0
-// MCP3201, Microchip, 12bits, 100ksps
-#define SMH1_ADCTYPE_MCP3201 1
-// MCP3201, Microchip, 12bits, 100ksps, for ArduEye Bug v1.0
-#define SMH1_ADCTYPE_MCP3201_2 2
-// MCP3001, Microchip, 10bits, 200ksps
-#define SMH1_ADCTYPE_MCP3001 3
-
-/*********************************************************************/
 
 #if defined (__AVR_ATmega8__)||(__AVR_ATmega168__)|  	(__AVR_ATmega168P__)||(__AVR_ATmega328P__)
 
@@ -128,7 +116,7 @@ class ArduEyeSMH
     private:
 
         //indicates whether amplifier is in use	
-        char useAmp;
+        bool useAmp;
 
         // input pins
         uint8_t _resp;
@@ -139,9 +127,66 @@ class ArduEyeSMH
 
         void init_pin(uint8_t pin);
 
+        void get_image(
+                short *img, 
+                uint8_t rowstart, 
+                uint8_t numrows, 
+                uint8_t rowskip, 
+                uint8_t colstart, 
+                uint8_t numcols, 
+                uint8_t colskip, 
+                uint8_t input,
+                bool use_digital);
+
+        void get_image_row_sum(
+                short *img, 
+                uint8_t rowstart, 
+                uint8_t numrows, 
+                uint8_t rowskip, 
+                uint8_t colstart, 
+                uint8_t numcols, 
+                uint8_t colskip, 
+                uint8_t input, 
+                bool use_digital);
+
+        void get_image_col_sum(
+                short *img, 
+                uint8_t rowstart, 
+                uint8_t numrows, 
+                uint8_t rowskip, 
+                uint8_t colstart, 
+                uint8_t numcols, 
+                uint8_t colskip, 
+                uint8_t input, 
+                bool use_digital);
+
+        void find_max(
+                uint8_t rowstart, 
+                uint8_t numrows, 
+                uint8_t rowskip, 
+                uint8_t colstart, 
+                uint8_t numcols, 
+                uint8_t colskip, 
+                uint8_t input,
+                uint8_t *max_row, 
+                uint8_t *max_col,
+                bool use_digital);
+
+                void chip_to_matlab(uint8_t input, bool use_digital);
+
+                void section_to_matlab(
+                        uint8_t rowstart, 
+                        uint8_t numrows, 
+                        uint8_t rowskip, 
+                        uint8_t colstart, 
+                        uint8_t numcols, 
+                        uint8_t colskip, 
+                        uint8_t input, 
+                        bool use_digital);
+
     public:
 
-        /**
+                /**
          * Constructor
          */
         ArduEyeSMH(uint8_t resp, uint8_t incp, uint8_t resv, uint8_t incv, uint8_t inphi=0);
@@ -302,9 +347,10 @@ class ArduEyeSMH
         void applyMask(short *img, short size, uint8_t *mask, short mask_base);
 
         /*********************************************************************/
-        //	getImage
+        //	getImageAnalog
         //	This function acquires a box section of a Stonyman or Hawksbill 
-        //	and saves to image array img.  Note that images are read out in 
+        //  from the analog output, and and saves to image array img.  Note 
+        //  that images are read out in 
         //	raster manner (e.g. row wise) and stored as such in a 1D array. 
         //	In this case the pointer img points to the output array. 
         //
@@ -316,18 +362,17 @@ class ArduEyeSMH
         //	colstart: first column to acquire
         //	numcols: number of columns to acquire
         //	colskip: skipping between columns
-        //	ADCType: which ADC to use, defined ADC_TYPES
-        //	ANALOG (0,1,2,3): which analog input to use
+        //  
         //	
         //	EXAMPLES:
-        //	getImage(img,16,8,1,24,8,1,SMH1_ADCTYPE_ONBOARD,0): 
+        //	getImageAnalog(img,16,8,1,24,8,1,SMH1_ADCTYPE_ONBOARD,0): 
         //	Grab an 8x8 window of pixels at raw resolution starting at row 
         //	16, column 24, from chip using onboard ADC at input 0
         //	getImage(img,0,14,8,0,14,8,SMH1_ADCTYPE_MCP3201,2): 
         //	Grab entire Stonyman chip when using
         //	8x8 binning. Grab from input 2.
         /*********************************************************************/
-        void getImage(
+        void getImageAnalog(
                 short *img, 
                 uint8_t rowstart, 
                 uint8_t numrows, 
@@ -335,8 +380,17 @@ class ArduEyeSMH
                 uint8_t colstart, 
                 uint8_t numcols, 
                 uint8_t colskip, 
-                char ADCType,
-                char anain);
+                uint8_t input);
+
+        void getImageDigital(
+                short *img, 
+                uint8_t rowstart, 
+                uint8_t numrows, 
+                uint8_t rowskip, 
+                uint8_t colstart, 
+                uint8_t numcols, 
+                uint8_t colskip, 
+                uint8_t input);
 
         /*********************************************************************/
         //	getImageRowSum
@@ -366,7 +420,7 @@ class ArduEyeSMH
         //	Grab entire Stonyman chip when using
         //	8x8 binning. Grab from input 2.
         /*********************************************************************/
-        void getImageRowSum(
+        void getImageRowSumAnalog(
                 short *img, 
                 uint8_t rowstart, 
                 uint8_t numrows, 
@@ -374,8 +428,17 @@ class ArduEyeSMH
                 uint8_t colstart, 
                 uint8_t numcols, 
                 uint8_t colskip, 
-                char ADCType,
-                char anain);
+                uint8_t input);
+
+        void getImageRowSumDigital(
+                short *img, 
+                uint8_t rowstart, 
+                uint8_t numrows, 
+                uint8_t rowskip, 
+                uint8_t colstart, 
+                uint8_t numcols, 
+                uint8_t colskip, 
+                uint8_t input);
 
         /*********************************************************************/
         //	getImageColSum
@@ -405,14 +468,23 @@ class ArduEyeSMH
         //	Grab entire Stonyman chip when using
         //	8x8 binning. Grab from input 2.
         /*********************************************************************/
-        void getImageColSum(short *img, 
+        void getImageColSumAnalog(short *img, 
                 uint8_t rowstart, 
                 uint8_t numrows, 
                 uint8_t rowskip, 
                 uint8_t colstart, 
                 uint8_t numcols, 
                 uint8_t colskip, 
-                char ADCType,char anain);
+                uint8_t input);
+
+        void getImageColSumDigital(short *img, 
+                uint8_t rowstart, 
+                uint8_t numrows, 
+                uint8_t rowskip, 
+                uint8_t colstart, 
+                uint8_t numcols, 
+                uint8_t colskip, 
+                uint8_t input);
 
         /*********************************************************************/
         //	findMax
@@ -441,15 +513,25 @@ class ArduEyeSMH
         //	Search rows 8...104 and columns 8...104 for brightest pixel, with 
         //	onboard ADC, chip 0
         /*********************************************************************/
-        void findMax(
+        void findMaxAnalog(
                 uint8_t rowstart, 
                 uint8_t numrows, 
                 uint8_t rowskip, 
                 uint8_t colstart, 
                 uint8_t numcols, 
                 uint8_t colskip, 
-                char ADCType,
-                char anain,
+                uint8_t input,
+                uint8_t *max_row, 
+                uint8_t *max_col);
+
+        void findMaxDigital(
+                uint8_t rowstart, 
+                uint8_t numrows, 
+                uint8_t rowskip, 
+                uint8_t colstart, 
+                uint8_t numcols, 
+                uint8_t colskip, 
+                uint8_t input,
                 uint8_t *max_row, 
                 uint8_t *max_col);
 
@@ -460,11 +542,11 @@ class ArduEyeSMH
         //	into Matlab. The image is written be stored in matrix Img. 
         //
         //	VARIABLES: 
-        //	whichchip(0 or 1): 0 for Stonyman, 1 for Hawksbill
         //	ADCType: which ADC to use, defined ADC_TYPES
         //	ANALOG (0,1,2,3): Selects one analog input
         /*********************************************************************/
-        void chipToMatlab(char whichchip,char ADCType,char anain);
+        void chipToMatlabAnalog(uint8_t input);
+        void chipToMatlabDigital(uint8_t input);
 
         /*********************************************************************/
         //	sectionToMatlab
@@ -490,15 +572,23 @@ class ArduEyeSMH
         //	Grab entire Stonyman chip when using 8x8 binning. Grab from input 
         //	2.
         /*********************************************************************/
-        void sectionToMatlab(
+        void sectionToMatlabAnalog(
                 uint8_t rowstart, 
                 uint8_t numrows, 
                 uint8_t rowskip, 
                 uint8_t colstart, 
                 uint8_t numcols, 
                 uint8_t colskip, 
-                char ADCType, 
-                uint8_t anain);   
+                uint8_t input);   
+
+        void sectionToMatlabDigital(
+                uint8_t rowstart, 
+                uint8_t numrows, 
+                uint8_t rowskip, 
+                uint8_t colstart, 
+                uint8_t numcols, 
+                uint8_t colskip, 
+                uint8_t input);   
 };
 
 #endif

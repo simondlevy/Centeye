@@ -162,18 +162,6 @@ void ArduEyeSMH::setAmpGain(char gain)
     setPointerValue(SMH_SYS_CONFIG,config);	//set config register
 }
 
-void ArduEyeSMH::setAnalogInput(char analogInput)
-{
-    (void)analogInput;
-}
-
-void ArduEyeSMH::setADCInput(char ADCInput,char state)
-{
-    (void)ADCInput;
-    (void)state;
-
-}
-
 void ArduEyeSMH::setBinning(short hbin,short vbin)
 {
     short hsw,vsw;
@@ -236,17 +224,43 @@ void ArduEyeSMH::applyMask(short *img, short size, uint8_t *mask, short mask_bas
     }
 }
 
-void ArduEyeSMH::getImage(short *img, 
+void ArduEyeSMH::getImageAnalog(short *img, 
         uint8_t rowstart, 
         uint8_t numrows, 
         uint8_t rowskip, 
         uint8_t colstart, 
         uint8_t numcols, 
         uint8_t colskip, 
-        char ADCType,
-        char ANALOG) 
+        uint8_t input) 
 {
-    (void)ADCType;
+    get_image(img, rowstart, numrows, rowskip, colstart, numcols, colskip, input, false);
+}
+
+void ArduEyeSMH::getImageDigital(short *img, 
+        uint8_t rowstart, 
+        uint8_t numrows, 
+        uint8_t rowskip, 
+        uint8_t colstart, 
+        uint8_t numcols, 
+        uint8_t colskip, 
+        uint8_t input) 
+{
+    get_image(img, rowstart, numrows, rowskip, colstart, numcols, colskip, input, true);
+}
+
+void ArduEyeSMH::get_image(
+        short *img, 
+        uint8_t rowstart, 
+        uint8_t numrows, 
+        uint8_t rowskip, 
+        uint8_t colstart, 
+        uint8_t numcols, 
+        uint8_t colskip, 
+        uint8_t input, 
+        bool    use_digital) 
+{
+    // XXX need to support digital (SPI) as well    
+    (void)use_digital;
 
     short *pimg = img; // pointer to output image array
     short val;
@@ -274,7 +288,7 @@ void ArduEyeSMH::getImage(short *img,
             // get data value
             delayMicroseconds(1);
 
-            val = analogRead(ANALOG); // acquire pixel
+            val = analogRead(input); // acquire pixel XXX need to support digital (SPI) as well
 
             *pimg = val; // store pixel
             pimg++; // advance pointer
@@ -285,7 +299,7 @@ void ArduEyeSMH::getImage(short *img,
     }
 }
 
-void ArduEyeSMH::getImageRowSum(
+void ArduEyeSMH::getImageRowSumAnalog(
         short *img, 
         uint8_t rowstart, 
         uint8_t numrows, 
@@ -293,9 +307,37 @@ void ArduEyeSMH::getImageRowSum(
         uint8_t colstart, 
         uint8_t numcols, 
         uint8_t colskip, 
-        char ADCType,
-        char ANALOG) 
+        uint8_t input)
 {
+    get_image_row_sum(img, rowstart, numrows, rowskip, colstart, numcols, colskip, input, false);
+}
+
+void ArduEyeSMH::getImageRowSumDigital(
+        short *img, 
+        uint8_t rowstart, 
+        uint8_t numrows, 
+        uint8_t rowskip, 
+        uint8_t colstart, 
+        uint8_t numcols, 
+        uint8_t colskip, 
+        uint8_t input)
+{
+    get_image_row_sum(img, rowstart, numrows, rowskip, colstart, numcols, colskip, input, true);
+}
+
+void ArduEyeSMH::get_image_row_sum(
+        short *img, 
+        uint8_t rowstart, 
+        uint8_t numrows, 
+        uint8_t rowskip, 
+        uint8_t colstart, 
+        uint8_t numcols, 
+        uint8_t colskip, 
+        uint8_t input,
+        bool use_digital) 
+{
+    (void)use_digital;
+
     short *pimg = img; // pointer to output image array
     short val,total=0;
     uint8_t row,col;
@@ -324,7 +366,7 @@ void ArduEyeSMH::getImageRowSum(
             // get data value
             delayMicroseconds(1);
 
-            val = analogRead(ANALOG); // acquire pixel
+            val = analogRead(input); // acquire pixel
 
             total+=val;	//sum values along row
             incValue(colskip); // go to next column
@@ -336,13 +378,9 @@ void ArduEyeSMH::getImageRowSum(
         setPointer(SMH_SYS_ROWSEL);
         incValue(rowskip); // go to next row
     }
-
-    if((ADCType!=SMH1_ADCTYPE_ONBOARD)&&(ADCType!=SMH1_ADCTYPE_MCP3201_2))
-        setADCInput(ANALOG,0); // disable chip
-
 }
 
-void ArduEyeSMH::getImageColSum(
+void ArduEyeSMH::getImageColSumAnalog(
         short *img, 
         uint8_t rowstart, 
         uint8_t numrows, 
@@ -350,9 +388,37 @@ void ArduEyeSMH::getImageColSum(
         uint8_t colstart, 
         uint8_t numcols, 
         uint8_t colskip, 
-        char ADCType,
-        char ANALOG) 
+        uint8_t input) 
 {
+    get_image_col_sum(img, rowstart, numrows, rowskip, colstart, numcols, colskip, input, false);
+}
+
+void ArduEyeSMH::getImageColSumDigital(
+        short *img, 
+        uint8_t rowstart, 
+        uint8_t numrows, 
+        uint8_t rowskip, 
+        uint8_t colstart, 
+        uint8_t numcols, 
+        uint8_t colskip, 
+        uint8_t input) 
+{
+    get_image_col_sum(img, rowstart, numrows, rowskip, colstart, numcols, colskip, input, true);
+}
+    
+void ArduEyeSMH::get_image_col_sum(
+        short *img, 
+        uint8_t rowstart, 
+        uint8_t numrows, 
+        uint8_t rowskip, 
+        uint8_t colstart, 
+        uint8_t numcols, 
+        uint8_t colskip, 
+        uint8_t input,
+        bool use_digital) 
+{
+    (void)use_digital;
+
     short *pimg = img; // pointer to output image array
     short val,total=0;
     uint8_t row,col;
@@ -381,7 +447,7 @@ void ArduEyeSMH::getImageColSum(
             // get data value
             delayMicroseconds(1);
 
-            val = analogRead(ANALOG); // acquire pixel
+            val = analogRead(input); // acquire pixel
 
             total+=val;	//sum value along column
             incValue(rowskip); // go to next row
@@ -393,26 +459,51 @@ void ArduEyeSMH::getImageColSum(
         setPointer(SMH_SYS_COLSEL);
         incValue(colskip); // go to next col
     }
-
-    if((ADCType!=SMH1_ADCTYPE_ONBOARD)&&(ADCType!=SMH1_ADCTYPE_MCP3201_2))
-        setADCInput(ANALOG,0); // disable chip
-
 }
 
 
-void ArduEyeSMH::findMax(
+void ArduEyeSMH::findMaxAnalog(
         uint8_t rowstart, 
         uint8_t numrows, 
         uint8_t rowskip, 
         uint8_t colstart, 
         uint8_t numcols,
         uint8_t colskip, 
-        char ADCType,
-        char ANALOG,
-        unsigned 
-        char *max_row, 
+        uint8_t input,
+        uint8_t *max_row, 
         uint8_t *max_col)
 {
+    find_max(rowstart, numrows, rowskip, colstart, numcols, colskip, input, max_row, max_col, false);
+}
+
+void ArduEyeSMH::findMaxDigital(
+        uint8_t rowstart, 
+        uint8_t numrows, 
+        uint8_t rowskip, 
+        uint8_t colstart, 
+        uint8_t numcols,
+        uint8_t colskip, 
+        uint8_t input,
+        uint8_t *max_row, 
+        uint8_t *max_col)
+{
+    find_max(rowstart, numrows, rowskip, colstart, numcols, colskip, input, max_row, max_col, true);
+}
+
+void ArduEyeSMH::find_max(
+        uint8_t rowstart, 
+        uint8_t numrows, 
+        uint8_t rowskip, 
+        uint8_t colstart, 
+        uint8_t numcols,
+        uint8_t colskip, 
+        uint8_t input,
+        uint8_t *max_row, 
+        uint8_t *max_col,
+        bool use_digital)
+{
+    (void)use_digital;
+
     unsigned short maxval=5000,minval=0,val;
     uint8_t row,col,bestrow=0,bestcol=0;
 
@@ -438,7 +529,7 @@ void ArduEyeSMH::findMax(
             // get data value
             delayMicroseconds(1);
 
-            val = analogRead(ANALOG); // acquire pixel
+            val = analogRead(input); // acquire pixel
 
             if(useAmp)	//amplifier is inverted
             {
@@ -465,29 +556,32 @@ void ArduEyeSMH::findMax(
         incValue(rowskip); // go to next row
     }
 
-    if(ADCType!=SMH1_ADCTYPE_ONBOARD)
-        setADCInput(ANALOG,0); // disable chip
-
     *max_row = bestrow;
     *max_col = bestcol;
 }
 
-void ArduEyeSMH::chipToMatlab(char whichchip,char ADCType, char ANALOG) 
+void ArduEyeSMH::chipToMatlabAnalog(uint8_t input) 
 {
-    uint8_t row,col,rows,cols;
-    unsigned short val;
+    chip_to_matlab(input, false); 
+}
 
-    if (whichchip==1) {
-        rows=cols=136;	//hawksbill
-    }	else {
-        rows=cols=112;	//stonyman
-    }	
+void ArduEyeSMH::chipToMatlabDigital(uint8_t input) 
+{
+    chip_to_matlab(input, true); 
+}
+
+void ArduEyeSMH::chip_to_matlab(uint8_t input, bool use_digital) 
+{
+    (void)use_digital;
+
+    uint8_t row,col;
+    unsigned short val;
 
     Serial.println("Img = [");
     setPointerValue(SMH_SYS_ROWSEL,0); // set row = 0
-    for (row=0; row<rows; ++row) {
+    for (row=0; row<112; ++row) {
         setPointerValue(SMH_SYS_COLSEL,0); // set column = 0
-        for (col=0; col<cols; ++col) {
+        for (col=0; col<112; ++col) {
             // settling delay
             delayMicroseconds(1);
             // pulse amplifier if needed
@@ -497,7 +591,7 @@ void ArduEyeSMH::chipToMatlab(char whichchip,char ADCType, char ANALOG)
             // get data value
             delayMicroseconds(1);
 
-            val = analogRead(ANALOG); // acquire pixel
+            val = analogRead(input); // acquire pixel
 
             // increment column
             incValue(1);
@@ -509,23 +603,43 @@ void ArduEyeSMH::chipToMatlab(char whichchip,char ADCType, char ANALOG)
         Serial.println(" ");
     }
     Serial.println("];");
-    if(ADCType!=SMH1_ADCTYPE_ONBOARD)
-        setADCInput(ANALOG,0); // disable chip
-
 }
 
-void ArduEyeSMH::sectionToMatlab(
+void ArduEyeSMH::sectionToMatlabAnalog(
         uint8_t rowstart, 
         uint8_t numrows, 
         uint8_t rowskip, 
         uint8_t colstart, 
         uint8_t numcols, 
         uint8_t colskip, 
-        char ADCType, 
-        uint8_t ANALOG) 
+        uint8_t input) 
 {
-    // XXX should support SPI 
-    (void)ADCType;
+    section_to_matlab(rowstart, numrows, rowskip, colstart, numcols, colskip, input, false);
+}
+
+void ArduEyeSMH::sectionToMatlabDigital(
+        uint8_t rowstart, 
+        uint8_t numrows, 
+        uint8_t rowskip, 
+        uint8_t colstart, 
+        uint8_t numcols, 
+        uint8_t colskip, 
+        uint8_t input) 
+{
+    section_to_matlab(rowstart, numrows, rowskip, colstart, numcols, colskip, input, true);
+}
+
+void ArduEyeSMH::section_to_matlab(
+        uint8_t rowstart, 
+        uint8_t numrows, 
+        uint8_t rowskip, 
+        uint8_t colstart, 
+        uint8_t numcols, 
+        uint8_t colskip, 
+        uint8_t input,
+        bool use_digital) 
+{
+    (void)use_digital;
 
     short val;
     uint8_t row,col;
@@ -547,7 +661,7 @@ void ArduEyeSMH::sectionToMatlab(
 
             delayMicroseconds(1);
 
-            val = analogRead(ANALOG); // acquire pixel
+            val = analogRead(input); // acquire pixel
 
             incValue(colskip);
             Serial.print(val);

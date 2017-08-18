@@ -80,7 +80,7 @@ short skipcol=SKIP_PIXELS;     //pixels to be skipped during readout because of 
 short sr=START_PIXEL;          //first pixel row to read
 short sc=START_PIXEL;          //first pixel col to read
 
-short chipSelect=0;            //which vision chip to read from
+short input=0;            //which vision chip to read from
 
 // FPN calibration. To save memory we are placing the FPN calibration
 // array in an unsigned char, since the variation between pixels may be 
@@ -101,9 +101,6 @@ byte points[2];  //points array to send down to the GUI
 
 //a set of vectors to send down
 char vectors[8];
-
-//default ADC is the Arduino onboard ADC
-unsigned char adcType=SMH1_ADCTYPE_ONBOARD;
 
 //object representing our sensor
 ArduEyeSMH arduEyeSMH(RESP, INCP, RESV, INCV);
@@ -134,11 +131,11 @@ void loop()
     processCommands();
 
     //get an image from the stonyman chip
-    arduEyeSMH.getImage(img,sr,row,skiprow,sc,col,skipcol,adcType,chipSelect);
+    arduEyeSMH.getImageAnalog(img,sr,row,skiprow,sc,col,skipcol,input);
 
     //find the maximum value.  This actually takes an image a second time, so
     //to speed up this loop you should comment this out
-    arduEyeSMH.findMax(sr,row,skiprow,sc,col,skipcol,adcType,chipSelect,&row_max,&col_max);
+    arduEyeSMH.findMaxAnalog(sr,row,skiprow,sc,col,skipcol,input,&row_max,&col_max);
 
     //apply an FPNMask to the image.  This needs to be calculated with the "f" command
     //while the vision chip is covered with a white sheet of paper to expose it to 
@@ -201,29 +198,29 @@ void processCommands()
 
             //CHANGE ADC TYPE
             case 'a':
+                Serial.println("Not implemented");
+                /*
                 if(commandArgument==0)
                 {
-                    adcType=SMH1_ADCTYPE_ONBOARD;  //arduino onboard
                     Serial.println("Onboard ADC");
                 }
                 if(commandArgument==1)
                 {
-                    adcType=SMH1_ADCTYPE_MCP3201;  //external ADC (168/328 only)
                     Serial.println("External ADC (doesn't work with Mega2560)");
-                }
+                }*/
                 break;
 
                 // calculate FPN mask and apply it to current image
             case 'f': 
-                arduEyeSMH.getImage(img,sr,row,skiprow,sc,col,skipcol,adcType,chipSelect);
+                arduEyeSMH.getImageAnalog(img,sr,row,skiprow,sc,col,skipcol,input);
                 arduEyeSMH.calcMask(img,row*col,mask,&mask_base);
                 Serial.println("FPN Mask done");  
                 break;   
 
                 //change chip select
             case 's':
-                chipSelect=commandArgument;
-                sprintf(charbuf,"chip select = %d",chipSelect);
+                input=commandArgument;
+                sprintf(charbuf,"chip select = %d",input);
                 Serial.println(charbuf);
                 break;
 
