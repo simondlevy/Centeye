@@ -127,7 +127,7 @@ class Stonyman
 
         /**
          * Sets the VREF register value 
-         *   @param vref value to put in the register (0-63)
+         * @param vref value to put in the register (0-63)
          */
         void setVref(uint8_t vref);
 
@@ -139,6 +139,7 @@ class Stonyman
 
         /**
          * Sets the AOBIAS register value (0-63)
+         * @param aobias value to put in the register (0-63)
          */
         void setAobias(uint8_t aobias);
 
@@ -150,6 +151,9 @@ class Stonyman
 
         /**
          * Sets all three biases
+         * @param vref value to put in the register (0-63)
+         * @param nbias value to put in the register (0-63)
+         * @param aobias value to put in the register (0-63)
          */
         void setBiases(uint8_t vref, uint8_t nbias, uint8_t aobias);
 
