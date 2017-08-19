@@ -1,7 +1,7 @@
 
-/* ARDUEYE_OpticalFlow_EXAMPLE_V1
+/* Optical Flow example
 
-   This sketch features the ArduEye_OFO library, which helps
+   This sketch features the OpticalFlow library, which helps
    to calculate optical flow between two images using
    several methods which are demonstrated here.
 
@@ -74,125 +74,47 @@
 
 // recall from note above that image arrays are stored row-size in a 1D array
 
-short last_img[MAX_PIXELS];         //1D image array
-short current_img[MAX_PIXELS];
-short row=MAX_ROWS;            //maximum rows allowed by memory
-short col=MAX_COLS;            //maximum cols allowed by memory
-short skiprow=SKIP_PIXELS;     //pixels to be skipped during readout because of downsampling
-short skipcol=SKIP_PIXELS;     //pixels to be skipped during readout because of downsampling 
-short sr=START_ROW;          //first pixel row to read
-short sc=START_COL;          //first pixel col to read
+static short last_img[MAX_PIXELS];         //1D image array
+static short current_img[MAX_PIXELS];
+static short row=MAX_ROWS;            //maximum rows allowed by memory
+static short col=MAX_COLS;            //maximum cols allowed by memory
+static short skiprow=SKIP_PIXELS;     //pixels to be skipped during readout because of downsampling
+static short skipcol=SKIP_PIXELS;     //pixels to be skipped during readout because of downsampling 
+static short sr=START_ROW;          //first pixel row to read
+static short sc=START_COL;          //first pixel col to read
 
-short inputPin=0;            //which vision chip to read from
+static short inputPin=0;            //which vision chip to read from
 
 // FPN calibration. To save memory we are placing the FPN calibration
 // array in an unsigned char, since the variation between pixels may be 
 // expressed with a single byte. Variable mask_base holds an offset value 
 // applied to the entire FPN array. Thus the FPN mask for pixel i will be the 
 // value mask[i]+mask_base.
-unsigned char mask[MAX_PIXELS]; // 16x16 FPN calibration image
-short mask_base=0; // FPN calibration image base.
+static unsigned char mask[MAX_PIXELS]; // 16x16 FPN calibration image
+short static mask_base=0; // FPN calibration image base.
 
 // Command inputs - for receiving commands from user via Serial terminal
-char command; // command character
-int commandArgument; // argument of command
+static char command; // command character
+static int commandArgument; // argument of command
 
 //a set of vectors to send down
-char vectors[2];
+static char vectors[2];
 
-char OFType=0;
+static char OFType=0;
 
 //optical flow X and Y
-short filtered_OFX=0,filtered_OFY=0;
-short OFX=0,OFY=0;
+static short filtered_OFX=0,filtered_OFY=0;
+static short OFX=0,OFY=0;
 
 //object representing our sensor
-Stonyman stonyman(RESP, INCP, RESV, INCV);
-
-//=======================================================================
-// ARDUINO SETUP AND LOOP FUNCTIONS
-
-void setup() 
-{
-    // initialize serial port
-    Serial.begin(115200); //GUI defaults to this baud rate
-
-    //initialize SPI (needed for external ADC
-    SPI.begin();
-
-    //initialize ArduEye Stonyman
-    stonyman.begin();
-
-    //set the initial binning on the vision chip
-    stonyman.setBinning(skipcol,skiprow);
-}
-
-void loop() 
-{
-
-    //process commands from serial (should be performed once every execution of loop())
-    processCommands();
-
-    //get an image from the stonyman chip
-    stonyman.getImageAnalog(current_img,sr,row,skiprow,sc,col,skipcol,inputPin);
-
-    //apply an FPNMask to the image.  This needs to be calculated with the "f" command
-    //while the vision chip is covered with a white sheet of paper to expose it to 
-    //uniform illumination.  Once calculated, it will remove fixed-pattern noise  
-    stonyman.applyMask(current_img,row*col,mask,mask_base);
-
-    //if GUI is enabled then send image for display
-    ArduEyeGUI.sendImage(row,col,current_img,row*col);
-
-    /***********************************************************************************/
-    /***********************************************************************************/
-    //   OPTICAL FLOW
-    /***********************************************************************************/
-    /***********************************************************************************/
-
-    //calculate optical flow
-
-    //Image Interpolation 2D with standard "plus" shifting
-    if(OFType==0)
-        IIA_Plus_2D(current_img,last_img,row,col,200,&OFX,&OFY);
-    //Image Interpolation 2D with compact "square" shifting
-    if(OFType==1)
-        IIA_Square_2D(current_img,last_img,row,col,200,&OFX,&OFY);
-    //Lucas Kanade 2D with standard "plus" shifting
-    if(OFType==2)
-        LK_Plus_2D(current_img,last_img,row,col,200,&OFX,&OFY);
-    //Lucas Kanade 2D with compact "square" shifting
-    if(OFType==3)
-        LK_Square_2D(current_img,last_img,row,col,200,&OFX,&OFY);
-
-    //low pass filter the X shift
-    LPF(&filtered_OFX,&OFX,0.35);
-
-    //low pass filter the Y shift
-    LPF(&filtered_OFY,&OFY,0.35);
-
-    //put filtered shifts into array to send to GUI
-    vectors[0]=filtered_OFX;    //vector1 x
-    vectors[1]=filtered_OFY;     //vector1 y
-
-    //send shifts to be displayed on GUI
-    ArduEyeGUI.sendVectors(1,1,vectors,1);
-
-    //copy current_img to last_img so two frames are kept
-    //for optical flow calculation
-    CYE_ImgShortCopy(current_img,last_img,row*col);
-
-    //small delay
-    delay(5);
-}
-
+static Stonyman stonyman(RESP, INCP, RESV, INCV);
 
 //=======================================================================
 // FUNCTIONS DEFINED FOR THIS SKETCH
 
 // the processCommands function reads and responds to commands sent to
 // the Arduino over the serial connection.  
-void processCommands()
+static void processCommands()
 {
     char charbuf[20];
 
@@ -257,4 +179,77 @@ void processCommands()
         }
     }
 }
+
+
+//=======================================================================
+// ARDUINO SETUP AND LOOP FUNCTIONS
+
+void setup() 
+{
+    // initialize serial port
+    Serial.begin(115200); //GUI defaults to this baud rate
+
+    //initialize SPI (needed for external ADC
+    SPI.begin();
+
+    //initialize ArduEye Stonyman
+    stonyman.begin();
+
+    //set the initial binning on the vision chip
+    stonyman.setBinning(skipcol,skiprow);
+}
+
+void loop() 
+{
+
+    //process commands from serial (should be performed once every execution of loop())
+    processCommands();
+
+    //get an image from the stonyman chip
+    stonyman.getImageAnalog(current_img,sr,row,skiprow,sc,col,skipcol,inputPin);
+
+    //apply an FPNMask to the image.  This needs to be calculated with the "f" command
+    //while the vision chip is covered with a white sheet of paper to expose it to 
+    //uniform illumination.  Once calculated, it will remove fixed-pattern noise  
+    stonyman.applyMask(current_img,row*col,mask,mask_base);
+
+    //if GUI is enabled then send image for display
+    ArduEyeGUI.sendImage(row,col,current_img,row*col);
+
+    //calculate optical flow
+
+    //Image Interpolation 2D with standard "plus" shifting
+    if(OFType==0)
+        IIA_Plus_2D(current_img,last_img,row,col,200,&OFX,&OFY);
+    //Image Interpolation 2D with compact "square" shifting
+    if(OFType==1)
+        IIA_Square_2D(current_img,last_img,row,col,200,&OFX,&OFY);
+    //Lucas Kanade 2D with standard "plus" shifting
+    if(OFType==2)
+        LK_Plus_2D(current_img,last_img,row,col,200,&OFX,&OFY);
+    //Lucas Kanade 2D with compact "square" shifting
+    if(OFType==3)
+        LK_Square_2D(current_img,last_img,row,col,200,&OFX,&OFY);
+
+    //low pass filter the X shift
+    LPF(&filtered_OFX,&OFX,0.35);
+
+    //low pass filter the Y shift
+    LPF(&filtered_OFY,&OFY,0.35);
+
+    //put filtered shifts into array to send to GUI
+    vectors[0]=filtered_OFX;    //vector1 x
+    vectors[1]=filtered_OFY;     //vector1 y
+
+    //send shifts to be displayed on GUI
+    ArduEyeGUI.sendVectors(1,1,vectors,1);
+
+    //copy current_img to last_img so two frames are kept
+    //for optical flow calculation
+    CYE_ImgShortCopy(current_img,last_img,row*col);
+
+    //small delay
+    delay(5);
+}
+
 
