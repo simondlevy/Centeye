@@ -5,7 +5,7 @@
  to visualize the output of the ArduEye in the ArduEye 
  Processing GUI.  All code can be found at www.ardueye.com.
 
- An image is taken using the arduEyeSMH library and several data 
+ An image is taken using the stonyman library and several data 
  sets are sent down to the processing GUI.
  
  Started July 12, 2012
@@ -103,7 +103,7 @@ byte points[2];  //points array to send down to the GUI
 char vectors[8];
 
 //object representing our sensor
-ArduEyeSMH arduEyeSMH(RESP, INCP, RESV, INCV);
+Stonyman stonyman(RESP, INCP, RESV, INCV);
 
 
 //=======================================================================
@@ -118,10 +118,10 @@ void setup()
     SPI.begin();
 
     //initialize ArduEye Stonyman
-    arduEyeSMH.begin();
+    stonyman.begin();
 
     //set the initial binning on the vision chip
-    arduEyeSMH.setBinning(skipcol,skiprow);
+    stonyman.setBinning(skipcol,skiprow);
 }
 
 void loop() 
@@ -131,16 +131,16 @@ void loop()
     processCommands();
 
     //get an image from the stonyman chip
-    arduEyeSMH.getImageAnalog(img,sr,row,skiprow,sc,col,skipcol,input);
+    stonyman.getImageAnalog(img,sr,row,skiprow,sc,col,skipcol,input);
 
     //find the maximum value.  This actually takes an image a second time, so
     //to speed up this loop you should comment this out
-    arduEyeSMH.findMaxAnalog(sr,row,skiprow,sc,col,skipcol,input,&row_max,&col_max);
+    stonyman.findMaxAnalog(sr,row,skiprow,sc,col,skipcol,input,&row_max,&col_max);
 
     //apply an FPNMask to the image.  This needs to be calculated with the "f" command
     //while the vision chip is covered with a white sheet of paper to expose it to 
     //uniform illumination.  Once calculated, it will remove fixed-pattern noise  
-    arduEyeSMH.applyMask(img,row*col,mask,mask_base);
+    stonyman.applyMask(img,row*col,mask,mask_base);
 
     /***********************************************************************************/
     /***********************************************************************************/
@@ -212,8 +212,8 @@ void processCommands()
 
                 // calculate FPN mask and apply it to current image
             case 'f': 
-                arduEyeSMH.getImageAnalog(img,sr,row,skiprow,sc,col,skipcol,input);
-                arduEyeSMH.calcMask(img,row*col,mask,&mask_base);
+                stonyman.getImageAnalog(img,sr,row,skiprow,sc,col,skipcol,input);
+                stonyman.calcMask(img,row*col,mask,&mask_base);
                 Serial.println("FPN Mask done");  
                 break;   
 

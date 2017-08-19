@@ -108,7 +108,7 @@ unsigned char col_max;
 byte points[2];  //points array to send down to the GUI
 
 //object representing our sensor
-ArduEyeSMH arduEyeSMH(RESP, INCP, RESV, INCV);
+Stonyman stonyman(RESP, INCP, RESV, INCV);
 
 //=======================================================================
 // ARDUINO SETUP AND LOOP FUNCTIONS
@@ -122,10 +122,10 @@ void setup()
   SPI.begin();
   
   //initialize ArduEye Stonyman
-  arduEyeSMH.begin();
+  stonyman.begin();
   
   //set the initial binning on the vision chip
-  arduEyeSMH.setBinning(skipcol,skiprow);
+  stonyman.setBinning(skipcol,skiprow);
 }
 
 void loop() 
@@ -135,16 +135,16 @@ void loop()
   processCommands();
 
   //get an image from the stonyman chip
-  arduEyeSMH.getImageAnalog(img,sr,row,skiprow,sc,col,skipcol,input);
+  stonyman.getImageAnalog(img,sr,row,skiprow,sc,col,skipcol,input);
    
   //find the maximum value.  This actually takes an image a second time, so
   //to speed up this loop you should comment this out
-  arduEyeSMH.findMaxAnalog(sr,row,skiprow,sc,col,skipcol,input,&row_max,&col_max);
+  stonyman.findMaxAnalog(sr,row,skiprow,sc,col,skipcol,input,&row_max,&col_max);
     
   //apply an FPNMask to the image.  This needs to be calculated with the "f" command
   //while the vision chip is covered with a white sheet of paper to expose it to 
   //uniform illumination.  Once calculated, it will produce a better image  
-  arduEyeSMH.applyMask(img,row*col,mask,mask_base);
+  stonyman.applyMask(img,row*col,mask,mask_base);
   
   //if GUI is enabled then send image for display
   ArduEyeGUI.sendImage(row,col,img,row*col);
@@ -216,9 +216,9 @@ void processCommands()
       sc=START_PIXEL;          //first pixel col to read
       input=0;            //which vision chip to read from
       
-      arduEyeSMH.begin();
+      stonyman.begin();
       //set the initial binning on the vision chip
-      arduEyeSMH.setBinning(skipcol,skiprow);
+      stonyman.setBinning(skipcol,skiprow);
       Serial.println("Chip reset");
       break;
 
@@ -246,7 +246,7 @@ void processCommands()
       
     //set amplifier gain
     case 'g':
-      arduEyeSMH.setAmpGain(commandArgument);
+      stonyman.setAmpGain(commandArgument);
       sprintf(charbuf,"Amplifier gain = %d",commandArgument);
       Serial.println(charbuf);
       break;
@@ -256,7 +256,7 @@ void processCommands()
       if(fitsMemory(row,col)&&fitsArray(row,col,sr,sc,skipcol,commandArgument))
       {
        skipcol=commandArgument;
-       arduEyeSMH.setBinning(skipcol,skiprow);
+       stonyman.setBinning(skipcol,skiprow);
        sprintf(charbuf,"Horiz Binning = %d",skipcol);
        Serial.println(charbuf);      
       }
@@ -265,31 +265,31 @@ void processCommands()
       
     // calculate FPN mask and apply it to current image
     case 'f': 
-      arduEyeSMH.getImageAnalog(img,sr,row,skiprow,sc,col,skipcol,input);
-      arduEyeSMH.calcMask(img,row*col,mask,&mask_base);
+      stonyman.getImageAnalog(img,sr,row,skiprow,sc,col,skipcol,input);
+      stonyman.calcMask(img,row*col,mask,&mask_base);
       Serial.println("FPN Mask done");  
       break;   
       
     //change VREF
     case 'l':
-      arduEyeSMH.setVREF(commandArgument);
+      stonyman.setVREF(commandArgument);
       sprintf(charbuf,"VREF = %d",commandArgument);
       Serial.println(charbuf);  
     break;
     
     //print the current array over Serial in Matlab format      
     case 'm':
-      arduEyeSMH.sectionToMatlabAnalog(sr,row,skiprow,sc,col,skipcol,input);
+      stonyman.sectionToMatlabAnalog(sr,row,skiprow,sc,col,skipcol,input);
       break;
 
     //print the entire chip over Serial in Matlab format
     case 'M':   
-      arduEyeSMH.chipToMatlabAnalog(input);
+      stonyman.chipToMatlabAnalog(input);
       break;
       
     //change NBIAS
     case 'n': // set pinhole column
-      arduEyeSMH.setNBIAS(commandArgument);
+      stonyman.setNBIAS(commandArgument);
       sprintf(charbuf,"NBIAS = %d",commandArgument);
       Serial.println(charbuf);  
       break;     
@@ -328,7 +328,7 @@ void processCommands()
       if(fitsMemory(row,col)&&fitsArray(row,col,sr,sc,commandArgument,skipcol))
       {
        skiprow=commandArgument;
-       arduEyeSMH.setBinning(skipcol,skiprow);
+       stonyman.setBinning(skipcol,skiprow);
        sprintf(charbuf,"Vertical Binning = %d",skiprow);
        Serial.println(charbuf);    
       } 

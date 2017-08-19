@@ -1,9 +1,7 @@
 /*
 Stonyman.h Library for the Stonyman Centeye Vision Chip
 
-Basic functions to operate Stonyman/Hawksbill with ArduEye boards
-Supports all Arduino boards that use the ATMega 8/168/328/2560
-NOTE: ATMega 2560 SPI for external ADC is not supported.
+Basic functions to operate Stonyman with Arduino boards
 
 Copyright (c) 2012 Centeye, Inc. 
 All rights reserved.
@@ -59,7 +57,7 @@ policies, either expressed or implied, of Centeye, Inc.
 #define SMH_NBIAS_5V0 55	//nbias for 5 volts
 #define SMH_AOBIAS_5V0 55	//aobias for 5 volts
 
-ArduEyeSMH::ArduEyeSMH(uint8_t resp, uint8_t incp, uint8_t resv, uint8_t incv, uint8_t inphi)
+Stonyman::Stonyman(uint8_t resp, uint8_t incp, uint8_t resv, uint8_t incv, uint8_t inphi)
 {
     _resp = resp;
     _incp = incp;
@@ -68,13 +66,13 @@ ArduEyeSMH::ArduEyeSMH(uint8_t resp, uint8_t incp, uint8_t resv, uint8_t incv, u
     _inphi = inphi;
 }
 
-void ArduEyeSMH::init_pin(uint8_t pin)
+void Stonyman::init_pin(uint8_t pin)
 {
     pinMode(pin, OUTPUT);
     digitalWrite(pin, LOW);
 }
 
-void ArduEyeSMH::begin(short vref,short nbias,short aobias, char selamp)
+void Stonyman::begin(short vref,short nbias,short aobias, char selamp)
 {
     //set all digital pins to output
     init_pin(_resp);
@@ -106,7 +104,7 @@ static void pulse(int pin)
     digitalWrite(pin, LOW);
 }
 
-void ArduEyeSMH::set_pointer(char ptr)
+void Stonyman::set_pointer(char ptr)
 {
     // clear pointer
     pulse(_resp);
@@ -116,7 +114,7 @@ void ArduEyeSMH::set_pointer(char ptr)
         pulse(_incp);
 }
 
-void ArduEyeSMH::set_value(short val) 
+void Stonyman::set_value(short val) 
 {
     // clear pointer
     pulse(_resv);
@@ -126,46 +124,46 @@ void ArduEyeSMH::set_value(short val)
         pulse(_incv);
 }
 
-void ArduEyeSMH::inc_value(short val) 
+void Stonyman::inc_value(short val) 
 {
     for (short i=0; i<val; ++i) //increment pointer
         pulse(_incv);
 }
 
-void ArduEyeSMH::pulse_inphi(char delay) 
+void Stonyman::pulse_inphi(char delay) 
 {
     (void)delay;
     pulse(_inphi);
 }
 
-void ArduEyeSMH::set_pointer_value(char ptr,short val)
+void Stonyman::set_pointer_value(char ptr,short val)
 {
     set_pointer(ptr);	//set pointer to register
     set_value(val);	//set value of that register
 }
 
-void ArduEyeSMH::clear_values(void)
+void Stonyman::clear_values(void)
 {
     for (char i=0; i!=8; ++i)
         set_pointer_value(i,0);	//set each register to zero
 }
 
-void  ArduEyeSMH::setVREF(short vref)
+void  Stonyman::setVREF(short vref)
 {
     set_pointer_value(SMH_SYS_VREF,vref);
 }
 
-void  ArduEyeSMH::setNBIAS(short nbias)
+void  Stonyman::setNBIAS(short nbias)
 {
     set_pointer_value(SMH_SYS_NBIAS,nbias);
 }
 
-void  ArduEyeSMH::setAOBIAS(short aobias)
+void  Stonyman::setAOBIAS(short aobias)
 {
     set_pointer_value(SMH_SYS_AOBIAS,aobias);
 }
 
-void ArduEyeSMH::setBiasesVdd(char vddType)
+void Stonyman::setBiasesVdd(char vddType)
 {
 
     // determine biases. Only one option for now.
@@ -180,14 +178,14 @@ void ArduEyeSMH::setBiasesVdd(char vddType)
     }
 }
 
-void ArduEyeSMH::setBiases(short vref,short nbias,short aobias)
+void Stonyman::setBiases(short vref,short nbias,short aobias)
 {
     set_pointer_value(SMH_SYS_NBIAS,nbias);
     set_pointer_value(SMH_SYS_AOBIAS,aobias);
     set_pointer_value(SMH_SYS_VREF,vref);
 }
 
-void ArduEyeSMH::setConfig(char gain, char selamp, char cvdda) 
+void Stonyman::setConfig(char gain, char selamp, char cvdda) 
 {
     short config=gain+(selamp*8)+(cvdda*16);	//form register value
 
@@ -202,7 +200,7 @@ void ArduEyeSMH::setConfig(char gain, char selamp, char cvdda)
     set_pointer_value(SMH_SYS_CONFIG,config);
 }
 
-void ArduEyeSMH::setAmpGain(char gain)
+void Stonyman::setAmpGain(char gain)
 {
     short config;
 
@@ -220,7 +218,7 @@ void ArduEyeSMH::setAmpGain(char gain)
     set_pointer_value(SMH_SYS_CONFIG,config);	//set config register
 }
 
-void ArduEyeSMH::setBinning(short hbin,short vbin)
+void Stonyman::setBinning(short hbin,short vbin)
 {
     short hsw,vsw;
 
@@ -259,7 +257,7 @@ void ArduEyeSMH::setBinning(short hbin,short vbin)
     set_pointer_value(SMH_SYS_VSW,vsw);
 }
 
-void ArduEyeSMH::calcMask(short *img, short size, uint8_t *mask,short *mask_base)
+void Stonyman::calcMask(short *img, short size, uint8_t *mask,short *mask_base)
 {
     *mask_base = 10000; // e.g. "high"
 
@@ -272,7 +270,7 @@ void ArduEyeSMH::calcMask(short *img, short size, uint8_t *mask,short *mask_base
         mask[i] = img[i] - *mask_base;	//subtract min value for mask
 }
 
-void ArduEyeSMH::applyMask(short *img, short size, uint8_t *mask, short mask_base)
+void Stonyman::applyMask(short *img, short size, uint8_t *mask, short mask_base)
 {
     // Subtract calibration mask
     for (int i=0; i<size;++i) 
@@ -282,7 +280,7 @@ void ArduEyeSMH::applyMask(short *img, short size, uint8_t *mask, short mask_bas
     }
 }
 
-void ArduEyeSMH::getImageAnalog(short *img, 
+void Stonyman::getImageAnalog(short *img, 
         uint8_t rowstart, 
         uint8_t numrows, 
         uint8_t rowskip, 
@@ -294,7 +292,7 @@ void ArduEyeSMH::getImageAnalog(short *img,
     get_image(img, rowstart, numrows, rowskip, colstart, numcols, colskip, input, false);
 }
 
-void ArduEyeSMH::getImageDigital(short *img, 
+void Stonyman::getImageDigital(short *img, 
         uint8_t rowstart, 
         uint8_t numrows, 
         uint8_t rowskip, 
@@ -306,7 +304,7 @@ void ArduEyeSMH::getImageDigital(short *img,
     get_image(img, rowstart, numrows, rowskip, colstart, numcols, colskip, input, true);
 }
 
-void ArduEyeSMH::get_image(
+void Stonyman::get_image(
         short *img, 
         uint8_t rowstart, 
         uint8_t numrows, 
@@ -357,7 +355,7 @@ void ArduEyeSMH::get_image(
     }
 }
 
-void ArduEyeSMH::getImageRowSumAnalog(
+void Stonyman::getImageRowSumAnalog(
         short *img, 
         uint8_t rowstart, 
         uint8_t numrows, 
@@ -370,7 +368,7 @@ void ArduEyeSMH::getImageRowSumAnalog(
     get_image_row_sum(img, rowstart, numrows, rowskip, colstart, numcols, colskip, input, false);
 }
 
-void ArduEyeSMH::getImageRowSumDigital(
+void Stonyman::getImageRowSumDigital(
         short *img, 
         uint8_t rowstart, 
         uint8_t numrows, 
@@ -383,7 +381,7 @@ void ArduEyeSMH::getImageRowSumDigital(
     get_image_row_sum(img, rowstart, numrows, rowskip, colstart, numcols, colskip, input, true);
 }
 
-void ArduEyeSMH::get_image_row_sum(
+void Stonyman::get_image_row_sum(
         short *img, 
         uint8_t rowstart, 
         uint8_t numrows, 
@@ -438,7 +436,7 @@ void ArduEyeSMH::get_image_row_sum(
     }
 }
 
-void ArduEyeSMH::getImageColSumAnalog(
+void Stonyman::getImageColSumAnalog(
         short *img, 
         uint8_t rowstart, 
         uint8_t numrows, 
@@ -451,7 +449,7 @@ void ArduEyeSMH::getImageColSumAnalog(
     get_image_col_sum(img, rowstart, numrows, rowskip, colstart, numcols, colskip, input, false);
 }
 
-void ArduEyeSMH::getImageColSumDigital(
+void Stonyman::getImageColSumDigital(
         short *img, 
         uint8_t rowstart, 
         uint8_t numrows, 
@@ -464,7 +462,7 @@ void ArduEyeSMH::getImageColSumDigital(
     get_image_col_sum(img, rowstart, numrows, rowskip, colstart, numcols, colskip, input, true);
 }
     
-void ArduEyeSMH::get_image_col_sum(
+void Stonyman::get_image_col_sum(
         short *img, 
         uint8_t rowstart, 
         uint8_t numrows, 
@@ -520,7 +518,7 @@ void ArduEyeSMH::get_image_col_sum(
 }
 
 
-void ArduEyeSMH::findMaxAnalog(
+void Stonyman::findMaxAnalog(
         uint8_t rowstart, 
         uint8_t numrows, 
         uint8_t rowskip, 
@@ -534,7 +532,7 @@ void ArduEyeSMH::findMaxAnalog(
     find_max(rowstart, numrows, rowskip, colstart, numcols, colskip, input, max_row, max_col, false);
 }
 
-void ArduEyeSMH::findMaxDigital(
+void Stonyman::findMaxDigital(
         uint8_t rowstart, 
         uint8_t numrows, 
         uint8_t rowskip, 
@@ -548,7 +546,7 @@ void ArduEyeSMH::findMaxDigital(
     find_max(rowstart, numrows, rowskip, colstart, numcols, colskip, input, max_row, max_col, true);
 }
 
-void ArduEyeSMH::find_max(
+void Stonyman::find_max(
         uint8_t rowstart, 
         uint8_t numrows, 
         uint8_t rowskip, 
@@ -618,17 +616,17 @@ void ArduEyeSMH::find_max(
     *max_col = bestcol;
 }
 
-void ArduEyeSMH::chipToMatlabAnalog(uint8_t input) 
+void Stonyman::chipToMatlabAnalog(uint8_t input) 
 {
     chip_to_matlab(input, false); 
 }
 
-void ArduEyeSMH::chipToMatlabDigital(uint8_t input) 
+void Stonyman::chipToMatlabDigital(uint8_t input) 
 {
     chip_to_matlab(input, true); 
 }
 
-void ArduEyeSMH::chip_to_matlab(uint8_t input, bool use_digital) 
+void Stonyman::chip_to_matlab(uint8_t input, bool use_digital) 
 {
     (void)use_digital;
 
@@ -663,7 +661,7 @@ void ArduEyeSMH::chip_to_matlab(uint8_t input, bool use_digital)
     Serial.println("];");
 }
 
-void ArduEyeSMH::sectionToMatlabAnalog(
+void Stonyman::sectionToMatlabAnalog(
         uint8_t rowstart, 
         uint8_t numrows, 
         uint8_t rowskip, 
@@ -675,7 +673,7 @@ void ArduEyeSMH::sectionToMatlabAnalog(
     section_to_matlab(rowstart, numrows, rowskip, colstart, numcols, colskip, input, false);
 }
 
-void ArduEyeSMH::sectionToMatlabDigital(
+void Stonyman::sectionToMatlabDigital(
         uint8_t rowstart, 
         uint8_t numrows, 
         uint8_t rowskip, 
@@ -687,7 +685,7 @@ void ArduEyeSMH::sectionToMatlabDigital(
     section_to_matlab(rowstart, numrows, rowskip, colstart, numcols, colskip, input, true);
 }
 
-void ArduEyeSMH::section_to_matlab(
+void Stonyman::section_to_matlab(
         uint8_t rowstart, 
         uint8_t numrows, 
         uint8_t rowskip, 

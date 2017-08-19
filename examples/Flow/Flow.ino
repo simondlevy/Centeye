@@ -5,7 +5,7 @@
    to calculate optical flow between two images using
    several methods which are demonstrated here.
 
-   An image is taken using the arduEyeSMH library, optical
+   An image is taken using the stonyman library, optical
    flow is calculated using the ArduEyeOFO library, and
    data is sent to the GUI using the ArduEyeGUI library
 
@@ -107,7 +107,7 @@ short filtered_OFX=0,filtered_OFY=0;
 short OFX=0,OFY=0;
 
 //object representing our sensor
-ArduEyeSMH arduEyeSMH(RESP, INCP, RESV, INCV);
+Stonyman stonyman(RESP, INCP, RESV, INCV);
 
 //=======================================================================
 // ARDUINO SETUP AND LOOP FUNCTIONS
@@ -121,10 +121,10 @@ void setup()
     SPI.begin();
 
     //initialize ArduEye Stonyman
-    arduEyeSMH.begin();
+    stonyman.begin();
 
     //set the initial binning on the vision chip
-    arduEyeSMH.setBinning(skipcol,skiprow);
+    stonyman.setBinning(skipcol,skiprow);
 }
 
 void loop() 
@@ -134,12 +134,12 @@ void loop()
     processCommands();
 
     //get an image from the stonyman chip
-    arduEyeSMH.getImageAnalog(current_img,sr,row,skiprow,sc,col,skipcol,inputPin);
+    stonyman.getImageAnalog(current_img,sr,row,skiprow,sc,col,skipcol,inputPin);
 
     //apply an FPNMask to the image.  This needs to be calculated with the "f" command
     //while the vision chip is covered with a white sheet of paper to expose it to 
     //uniform illumination.  Once calculated, it will remove fixed-pattern noise  
-    arduEyeSMH.applyMask(current_img,row*col,mask,mask_base);
+    stonyman.applyMask(current_img,row*col,mask,mask_base);
 
     //if GUI is enabled then send image for display
     ArduEyeGUI.sendImage(row,col,current_img,row*col);
@@ -228,8 +228,8 @@ void processCommands()
 
                 // calculate FPN mask and apply it to current image
             case 'f': 
-                arduEyeSMH.getImageAnalog(current_img,sr,row,skiprow,sc,col,skipcol,inputPin);
-                arduEyeSMH.calcMask(current_img,row*col,mask,&mask_base);
+                stonyman.getImageAnalog(current_img,sr,row,skiprow,sc,col,skipcol,inputPin);
+                stonyman.calcMask(current_img,row*col,mask,&mask_base);
                 Serial.println("FPN Mask done");  
                 break;   
 

@@ -34,8 +34,8 @@ those of the authors and should not be interpreted as representing official
 policies, either expressed or implied, of Centeye, Inc.
 */
 
-#ifndef _ARDUEYE_SMH_H_INCLUDED
-#define _ARDUEYE_SMH_H_INCLUDED
+#ifndef _STONYMAN_INCLUDED
+#define _STONYMAN_INCLUDED
 
 
 #include <stdint.h>
@@ -78,16 +78,16 @@ policies, either expressed or implied, of Centeye, Inc.
 #define MAX_PIXELS (MAX_ROWS*MAX_COLS)
 
 /**
- *	ArduEyeSMH
+ *	Stonyman
  */
-class ArduEyeSMH 
+class Stonyman 
 {
     public:
 
         /**
          * Constructor
          */
-        ArduEyeSMH(uint8_t resp, uint8_t incp, uint8_t resv, uint8_t incv, uint8_t inphi=0);
+        Stonyman(uint8_t resp, uint8_t incp, uint8_t resv, uint8_t incv, uint8_t inphi=0);
 
         /**
         * Initializes the vision chips for normal operation.  Sets vision
