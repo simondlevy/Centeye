@@ -72,7 +72,7 @@ void Stonyman::init_pin(uint8_t pin)
     digitalWrite(pin, LOW);
 }
 
-void Stonyman::begin(short vref, short nbias, short aobias, bool selamp)
+void Stonyman::begin(uint8_t vref, uint8_t nbias, uint8_t aobias, bool selamp)
 {
     //set all digital pins to output
     init_pin(_resp);
@@ -144,17 +144,17 @@ void Stonyman::clear_values(void)
         set_pointer_value(i,0);	//set each register to zero
 }
 
-void  Stonyman::setVREF(short vref)
+void  Stonyman::setVref(uint8_t vref)
 {
     set_pointer_value(SMH_SYS_VREF,vref);
 }
 
-void  Stonyman::setNBIAS(short nbias)
+void  Stonyman::setNbias(uint8_t nbias)
 {
     set_pointer_value(SMH_SYS_NBIAS,nbias);
 }
 
-void  Stonyman::setAOBIAS(short aobias)
+void  Stonyman::setAobias(uint8_t aobias)
 {
     set_pointer_value(SMH_SYS_AOBIAS,aobias);
 }
@@ -174,7 +174,7 @@ void Stonyman::setBiasesVdd(uint8_t vddType)
     }
 }
 
-void Stonyman::setBiases(short vref,short nbias,short aobias)
+void Stonyman::setBiases(uint8_t vref, uint8_t nbias, uint8_t aobias)
 {
     set_pointer_value(SMH_SYS_NBIAS,nbias);
     set_pointer_value(SMH_SYS_AOBIAS,aobias);
@@ -214,7 +214,7 @@ void Stonyman::setAmpGain(uint8_t gain)
     set_pointer_value(SMH_SYS_CONFIG,config);	//set config register
 }
 
-void Stonyman::setBinning(short hbin,short vbin)
+void Stonyman::setBinning(uint8_t hbin,uint8_t vbin)
 {
     short hsw,vsw;
 
