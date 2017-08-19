@@ -95,11 +95,7 @@ class Stonyman
         * config register.  If no parameters are passed in, default values
         * are used.
         */
-        void begin(
-                short vref=30,
-                short nbias=40,
-                short aobias=40,
-                char selamp=0); 
+        void begin( short vref=30, short nbias=40, short aobias=40, bool selamp=false); 
 
         /*********************************************************************/
         //	setConfig
@@ -112,7 +108,7 @@ class Stonyman
         //	EXAMPLE 2: To use the amplifier and set the gain to 4:
         //	setConfig(4,1,1);
         /*********************************************************************/
-        void setConfig(char gain, char selamp,char cvdda=1);
+        void setConfig(uint8_t gain, uint8_t selamp,uint8_t cvdda=1);
 
         /*********************************************************************/
         //	setAmpGain
@@ -120,7 +116,7 @@ class Stonyman
         //	zero, amplifier is bypassed.  Otherwise the appropriate amplifier
         //	gain (range 1-7) is set.
         /*********************************************************************/
-        void setAmpGain(char gain);
+        void setAmpGain(uint8_t gain);
 
         /*********************************************************************/
         //	setBinning
@@ -159,7 +155,7 @@ class Stonyman
         //	setBiasesVdd
         //	Sets biases based on chip voltage
         /*********************************************************************/
-        void setBiasesVdd(char vddType);
+        void setBiasesVdd(uint8_t vddType);
 
         /*********************************************************************/
         //	setBiases
@@ -437,7 +433,7 @@ class Stonyman
     private:
 
         //indicates whether amplifier is in use	
-        bool useAmp;
+        bool use_amp;
 
         // input pins
         uint8_t _resp;
@@ -445,8 +441,6 @@ class Stonyman
         uint8_t _resv;
         uint8_t _incv;
         uint8_t _inphi;
-
-        void init_pin(uint8_t pin);
 
         void get_image(
                 short *img, 
@@ -505,11 +499,13 @@ class Stonyman
                 uint8_t input, 
                 bool use_digital);
 
+        static void init_pin(uint8_t pin);
+
         /*********************************************************************/
         // Chip Register and Value Manipulation
 
         // Sets pointer on chip
-        void set_pointer(char ptr);
+        void set_pointer(uint8_t ptr);
 
         // Sets value of current register
         void set_value(short val);
@@ -520,14 +516,14 @@ class Stonyman
 
         //	Operates the amplifier.  Sets inphi pin high, delays to allow
         //	value time to settle, and then brings it low.
-        void pulse_inphi(char delay); 
+        void pulse_inphi(uint8_t delay); 
 
         //	Resets the value of all registers to zero
         void clear_values(void);
 
         //	Sets the pointer to a register and sets the value of that        
         //	register
-        void set_pointer_value(char ptr,short val);
+        void set_pointer_value(uint8_t ptr,short val);
 };
 
 #endif

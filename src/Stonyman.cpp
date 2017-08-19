@@ -72,7 +72,7 @@ void Stonyman::init_pin(uint8_t pin)
     digitalWrite(pin, LOW);
 }
 
-void Stonyman::begin(short vref,short nbias,short aobias, char selamp)
+void Stonyman::begin(short vref, short nbias, short aobias, bool selamp)
 {
     //set all digital pins to output
     init_pin(_resp);
@@ -89,12 +89,8 @@ void Stonyman::begin(short vref,short nbias,short aobias, char selamp)
     //turn chip on with config value
     set_pointer_value(SMH_SYS_CONFIG,16);
 
-    //if amp is used, set useAmp variable
-    if(selamp==1)
-        useAmp=1;
-    else
-        useAmp=0;
-
+    //if amp is used, set use_amp variable
+    use_amp = selamp;
 }
 
 static void pulse(int pin)
@@ -104,7 +100,7 @@ static void pulse(int pin)
     digitalWrite(pin, LOW);
 }
 
-void Stonyman::set_pointer(char ptr)
+void Stonyman::set_pointer(uint8_t ptr)
 {
     // clear pointer
     pulse(_resp);
@@ -130,13 +126,13 @@ void Stonyman::inc_value(short val)
         pulse(_incv);
 }
 
-void Stonyman::pulse_inphi(char delay) 
+void Stonyman::pulse_inphi(uint8_t delay) 
 {
     (void)delay;
     pulse(_inphi);
 }
 
-void Stonyman::set_pointer_value(char ptr,short val)
+void Stonyman::set_pointer_value(uint8_t ptr,short val)
 {
     set_pointer(ptr);	//set pointer to register
     set_value(val);	//set value of that register
@@ -144,7 +140,7 @@ void Stonyman::set_pointer_value(char ptr,short val)
 
 void Stonyman::clear_values(void)
 {
-    for (char i=0; i!=8; ++i)
+    for (uint8_t i=0; i!=8; ++i)
         set_pointer_value(i,0);	//set each register to zero
 }
 
@@ -163,7 +159,7 @@ void  Stonyman::setAOBIAS(short aobias)
     set_pointer_value(SMH_SYS_AOBIAS,aobias);
 }
 
-void Stonyman::setBiasesVdd(char vddType)
+void Stonyman::setBiasesVdd(uint8_t vddType)
 {
 
     // determine biases. Only one option for now.
@@ -185,14 +181,14 @@ void Stonyman::setBiases(short vref,short nbias,short aobias)
     set_pointer_value(SMH_SYS_VREF,vref);
 }
 
-void Stonyman::setConfig(char gain, char selamp, char cvdda) 
+void Stonyman::setConfig(uint8_t gain, uint8_t selamp, uint8_t cvdda) 
 {
     short config=gain+(selamp*8)+(cvdda*16);	//form register value
 
-    if(selamp==1)	//if selamp is 1, set useAmp variable to 1
-        useAmp=1;
+    if(selamp==1)	//if selamp is 1, set use_amp variable to 1
+        use_amp=1;
     else 
-        useAmp=0;
+        use_amp=0;
 
     // Note that config will have the following form binary form:
     // 000csggg where c=cvdda, s=selamp, ggg=gain (3 bits)
@@ -200,19 +196,19 @@ void Stonyman::setConfig(char gain, char selamp, char cvdda)
     set_pointer_value(SMH_SYS_CONFIG,config);
 }
 
-void Stonyman::setAmpGain(char gain)
+void Stonyman::setAmpGain(uint8_t gain)
 {
     short config;
 
     if((gain>0)&&(gain<8))	//if gain is a proper value, connect amp
     {
         config=gain+8+16;	//gain+(selamp=1)+(cvdda=1)
-        useAmp=1;	//using amplifier
+        use_amp=1;	//using amplifier
     }
     else	//if gain is zero or outside range, bypass amp
     {
         config=16;	//(cvdda=1)
-        useAmp=0;	//bypassing amplifier
+        use_amp=0;	//bypassing amplifier
     }
 
     set_pointer_value(SMH_SYS_CONFIG,config);	//set config register
@@ -338,7 +334,7 @@ void Stonyman::get_image(
             delayMicroseconds(1);
 
             // pulse amplifier if needed
-            if (useAmp) 
+            if (use_amp) 
                 pulse_inphi(2);
 
             // get data value
@@ -416,7 +412,7 @@ void Stonyman::get_image_row_sum(
             delayMicroseconds(1);
 
             // pulse amplifier if needed
-            if (useAmp) 
+            if (use_amp) 
                 pulse_inphi(2);
 
             // get data value
@@ -497,7 +493,7 @@ void Stonyman::get_image_col_sum(
             delayMicroseconds(1);
 
             // pulse amplifier if needed
-            if (useAmp) 
+            if (use_amp) 
                 pulse_inphi(2);
 
             // get data value
@@ -579,7 +575,7 @@ void Stonyman::find_max(
             delayMicroseconds(1);
 
             // pulse amplifier if needed
-            if (useAmp) 
+            if (use_amp) 
                 pulse_inphi(2);
 
             // get data value
@@ -587,7 +583,7 @@ void Stonyman::find_max(
 
             val = analogRead(input); // acquire pixel
 
-            if(useAmp)	//amplifier is inverted
+            if(use_amp)	//amplifier is inverted
             {
                 if (val>minval) 	//find max val (bright)
                 {
@@ -641,7 +637,7 @@ void Stonyman::chip_to_matlab(uint8_t input, bool use_digital)
             // settling delay
             delayMicroseconds(1);
             // pulse amplifier if needed
-            if (useAmp) 
+            if (use_amp) 
                 pulse_inphi(2);
 
             // get data value
@@ -712,7 +708,7 @@ void Stonyman::section_to_matlab(
             delayMicroseconds(1);
 
             // pulse amplifier if needed
-            if (useAmp) 
+            if (use_amp) 
                 pulse_inphi(2);
 
             delayMicroseconds(1);
