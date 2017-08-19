@@ -37,33 +37,8 @@ policies, either expressed or implied, of Centeye, Inc.
 #ifndef _ARDUEYE_SMH_H_INCLUDED
 #define _ARDUEYE_SMH_H_INCLUDED
 
+
 #include <stdint.h>
-
-/*********************************************************************/
-//SMH System Registers
-
-#define SMH_SYS_COLSEL 0	//select column
-#define SMH_SYS_ROWSEL 1	//select row
-#define SMH_SYS_VSW 2		//vertical switching
-#define SMH_SYS_HSW 3		//horizontal switching
-#define SMH_SYS_VREF 4		//voltage reference
-#define SMH_SYS_CONFIG 5	//configuration register
-#define SMH_SYS_NBIAS 6		//nbias
-#define SMH_SYS_AOBIAS 7	//analog out bias
-
-/*********************************************************************/
-//default values
-
-// Supply voltage types
-// Notation: AVB is A.B volts. e.g. 5V0 is 5V, 3V3 is 3.3V, etc.
-#define SMH1_VDD_5V0  1
-
-#define SMH_VREF_5V0 30		//vref for 5 volts
-#define SMH_NBIAS_5V0 55	//nbias for 5 volts
-#define SMH_AOBIAS_5V0 55	//aobias for 5 volts
-
-#define SMH_GAIN_DEFAULT 0	//no amp gain
-#define SMH_SELAMP_DEFAULT 0	//amp bypassed
 
 /*********************************************************************/
 
@@ -107,80 +82,9 @@ policies, either expressed or implied, of Centeye, Inc.
  */
 class ArduEyeSMH 
 {
-    private:
-
-        //indicates whether amplifier is in use	
-        bool useAmp;
-
-        // input pins
-        uint8_t _resp;
-        uint8_t _incp;
-        uint8_t _resv;
-        uint8_t _incv;
-        uint8_t _inphi;
-
-        void init_pin(uint8_t pin);
-
-        void get_image(
-                short *img, 
-                uint8_t rowstart, 
-                uint8_t numrows, 
-                uint8_t rowskip, 
-                uint8_t colstart, 
-                uint8_t numcols, 
-                uint8_t colskip, 
-                uint8_t input,
-                bool use_digital);
-
-        void get_image_row_sum(
-                short *img, 
-                uint8_t rowstart, 
-                uint8_t numrows, 
-                uint8_t rowskip, 
-                uint8_t colstart, 
-                uint8_t numcols, 
-                uint8_t colskip, 
-                uint8_t input, 
-                bool use_digital);
-
-        void get_image_col_sum(
-                short *img, 
-                uint8_t rowstart, 
-                uint8_t numrows, 
-                uint8_t rowskip, 
-                uint8_t colstart, 
-                uint8_t numcols, 
-                uint8_t colskip, 
-                uint8_t input, 
-                bool use_digital);
-
-        void find_max(
-                uint8_t rowstart, 
-                uint8_t numrows, 
-                uint8_t rowskip, 
-                uint8_t colstart, 
-                uint8_t numcols, 
-                uint8_t colskip, 
-                uint8_t input,
-                uint8_t *max_row, 
-                uint8_t *max_col,
-                bool use_digital);
-
-                void chip_to_matlab(uint8_t input, bool use_digital);
-
-                void section_to_matlab(
-                        uint8_t rowstart, 
-                        uint8_t numrows, 
-                        uint8_t rowskip, 
-                        uint8_t colstart, 
-                        uint8_t numcols, 
-                        uint8_t colskip, 
-                        uint8_t input, 
-                        bool use_digital);
-
     public:
 
-                /**
+        /**
          * Constructor
          */
         ArduEyeSMH(uint8_t resp, uint8_t incp, uint8_t resv, uint8_t incv, uint8_t inphi=0);
@@ -191,49 +95,11 @@ class ArduEyeSMH
         * config register.  If no parameters are passed in, default values
         * are used.
         */
-        void begin(short vref=30,
+        void begin(
+                short vref=30,
                 short nbias=40,
                 short aobias=40,
-                char selamp=SMH_SELAMP_DEFAULT); 
-
-        /*********************************************************************/
-        // Chip Register and Value Manipulation
-
-        //set pointer on chip
-        void setPointer(char ptr);
-
-        /*********************************************************************/
-        //	setValue
-        //	Sets the value of the current register
-        /*********************************************************************/
-        void setValue(short val);
-
-        /*********************************************************************/
-        //	incValue
-        //	Sets the pointer system register to the desired value.  Value is
-        //	not reset so the current value must be taken into account
-        /*********************************************************************/
-        void incValue(short val);
-
-        /*********************************************************************/
-        //	pulseInphi
-        //	Operates the amplifier.  Sets inphi pin high, delays to allow
-        //	value time to settle, and then brings it low.
-        /*********************************************************************/
-        void pulseInphi(char delay); 
-
-        /*********************************************************************/
-        //	clearValues
-        //	Resets the value of all registers to zero
-        /*********************************************************************/
-        void clearValues(void);
-
-        /*********************************************************************/
-        //	setPointerValue
-        //	Sets the pointer to a register and sets the value of that        
-        //	register
-        /*********************************************************************/
-        void setPointerValue(char ptr,short val);
+                char selamp=0); 
 
         /*********************************************************************/
         //	setConfig
@@ -255,21 +121,6 @@ class ArduEyeSMH
         //	gain (range 1-7) is set.
         /*********************************************************************/
         void setAmpGain(char gain);
-
-        /*********************************************************************/
-        //	setAnalogInput
-        //	Sets the analog pin for one vision chip to be an input.
-        //	This is for the Arduino onboard ADC, not an external ADC
-        /*********************************************************************/
-        void setAnalogInput(char analogInput);
-
-        /*********************************************************************/
-        //	setADCInput
-        //	Sets the analog pin to be a digital output and select a chip
-        //	to connect to the external ADC.  The state can be used to
-        //	deselect a particular chip as well.
-        /*********************************************************************/
-        void setADCInput(char ADCInput,char state);
 
         /*********************************************************************/
         //	setBinning
@@ -583,6 +434,115 @@ class ArduEyeSMH
                 uint8_t numcols, 
                 uint8_t colskip, 
                 uint8_t input);   
+    private:
+
+        //indicates whether amplifier is in use	
+        bool useAmp;
+
+        // input pins
+        uint8_t _resp;
+        uint8_t _incp;
+        uint8_t _resv;
+        uint8_t _incv;
+        uint8_t _inphi;
+
+        void init_pin(uint8_t pin);
+
+        void get_image(
+                short *img, 
+                uint8_t rowstart, 
+                uint8_t numrows, 
+                uint8_t rowskip, 
+                uint8_t colstart, 
+                uint8_t numcols, 
+                uint8_t colskip, 
+                uint8_t input,
+                bool use_digital);
+
+        void get_image_row_sum(
+                short *img, 
+                uint8_t rowstart, 
+                uint8_t numrows, 
+                uint8_t rowskip, 
+                uint8_t colstart, 
+                uint8_t numcols, 
+                uint8_t colskip, 
+                uint8_t input, 
+                bool use_digital);
+
+        void get_image_col_sum(
+                short *img, 
+                uint8_t rowstart, 
+                uint8_t numrows, 
+                uint8_t rowskip, 
+                uint8_t colstart, 
+                uint8_t numcols, 
+                uint8_t colskip, 
+                uint8_t input, 
+                bool use_digital);
+
+        void find_max(
+                uint8_t rowstart, 
+                uint8_t numrows, 
+                uint8_t rowskip, 
+                uint8_t colstart, 
+                uint8_t numcols, 
+                uint8_t colskip, 
+                uint8_t input,
+                uint8_t *max_row, 
+                uint8_t *max_col,
+                bool use_digital);
+
+        void chip_to_matlab(uint8_t input, bool use_digital);
+
+        void section_to_matlab(
+                uint8_t rowstart, 
+                uint8_t numrows, 
+                uint8_t rowskip, 
+                uint8_t colstart, 
+                uint8_t numcols, 
+                uint8_t colskip, 
+                uint8_t input, 
+                bool use_digital);
+
+        /*********************************************************************/
+        // Chip Register and Value Manipulation
+
+        //set pointer on chip
+        void setPointer(char ptr);
+
+        /*********************************************************************/
+        //	setValue
+        //	Sets the value of the current register
+        /*********************************************************************/
+        void setValue(short val);
+
+        /*********************************************************************/
+        //	incValue
+        //	Sets the pointer system register to the desired value.  Value is
+        //	not reset so the current value must be taken into account
+        /*********************************************************************/
+        void incValue(short val);
+
+        /*********************************************************************/
+        //	pulseInphi
+        //	Operates the amplifier.  Sets inphi pin high, delays to allow
+        //	value time to settle, and then brings it low.
+        /*********************************************************************/
+        void pulseInphi(char delay); 
+
+        /*********************************************************************/
+        //	clearValues
+        //	Resets the value of all registers to zero
+        /*********************************************************************/
+        void clearValues(void);
+
+        /*********************************************************************/
+        //	setPointerValue
+        //	Sets the pointer to a register and sets the value of that        
+        //	register
+        /*********************************************************************/
+        void setPointerValue(char ptr,short val);
 };
 
 #endif
