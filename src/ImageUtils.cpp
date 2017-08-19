@@ -93,13 +93,14 @@ B: copy to image
 numpix: number of pixels e.g. rows * columns
 STATUS: UNTESTED
  */
-void ImgShortCopy(uint16_t *A, uint16_t *B,  uint16_t numpix) {
-     uint16_t pix;
-    uint16_t *pa,*pb;
-    pa=A; pb=B;
-    for (pix=0; pix<numpix; ++pix) {
+void ImgShortCopy(uint16_t *A, uint16_t *B,  uint16_t numpix) 
+{
+    uint16_t *pa = A;
+    uint16_t *pb = B;
+    for (uint16_t pix=0; pix<numpix; ++pix) {
         *pb = *pa;
-        pa++; pb++;
+        pa++; 
+        pb++;
     }
 }
 
@@ -111,13 +112,14 @@ B: copy to image
 numpix: number of pixels e.g. rows * columns
 STATUS: UNTESTED
  */
-void ImgShortCopy(uint8_t *A, uint8_t *B,  uint16_t numpix) {
-     uint16_t pix;
-    uint8_t *pa,*pb;
-    pa=A; pb=B;
-    for (pix=0; pix<numpix; ++pix) {
+void ImgShortCopy(uint8_t *A, uint8_t *B,  uint16_t numpix) 
+{
+    uint8_t *pa = A;
+    uint8_t *pb = B;
+    for (uint16_t pix=0; pix<numpix; ++pix) {
         *pb = *pa;
-        pa++; pb++;
+        pa++; 
+        pb++;
     }
 }
 
@@ -139,13 +141,12 @@ maxi: predefined maximum- pixel values greater than this are
 considered white. Enter 0 to force the function to use the maximum value
 STATUS: UNTESTED
  */
-void ImgShortDumpAsciiSerial(uint16_t *img, uint16_t numrows, uint16_t numcolumns, uint16_t mini, uint16_t maxi) {
-    uint16_t i,m,n,*pix,delta;
-
+void ImgShortDumpAsciiSerial(uint16_t *img, uint16_t numrows, uint16_t numcolumns, uint16_t mini, uint16_t maxi) 
+{
     // if mini==0 then we compute minimum
     if (mini==0) {
         mini = *img;
-        for (i=0,pix=img; i<numrows*numcolumns; ++i,++pix) {
+        for (uint16_t i=0,*pix=img; i<numrows*numcolumns; ++i,++pix) {
             if (*pix<mini)
                 mini=*pix;
         }
@@ -153,23 +154,23 @@ void ImgShortDumpAsciiSerial(uint16_t *img, uint16_t numrows, uint16_t numcolumn
     // if maxi==0 then we compute maximum
     if (maxi==0) {
         maxi = *img;
-        for (i=0,pix=img; i<numrows*numcolumns; ++i,++pix) {
+        for (uint16_t i=0,*pix=img; i<numrows*numcolumns; ++i,++pix) {
             if (*pix>maxi)
                 maxi=*pix;
         }
     }
     // Compute delta value for display
-    delta = maxi-mini;
+    uint16_t delta = maxi-mini;
     delta = delta / NUM_ASCII_DISP_CHARS;
     if (delta<1)
         delta=1;
 
     // Loop through and dump image
-    pix=img;
-    for (m=0; m<numrows; ++m) {
-        for (n=0; n<numcolumns; ++n) {
+    uint16_t *pix=img;
+    for (uint16_t m=0; m<numrows; ++m) {
+        for (uint16_t n=0; n<numcolumns; ++n) {
             // rescale pixel value to 0...9
-            i = *pix - mini;
+            uint16_t i = *pix - mini;
             i = i / delta;
             if (i<0)
                 i=0;
@@ -185,58 +186,6 @@ void ImgShortDumpAsciiSerial(uint16_t *img, uint16_t numrows, uint16_t numcolumn
     }
 }
 
-#ifdef __UNUSED
-// Below is an older version of this function we are retaining, commented out, in case we need to 
-// revive it.
-void ImgShortDumpAsciiSerial(uint16_t *img, uint16_t numrows, uint16_t numcolumns, uint16_t mini, uint16_t maxi) {
-    uint16_t i,m,n,*pix,delta;
-
-    // if mini==0 then we compute minimum
-    if (mini==0) {
-        mini = *img;
-        for (i=0,pix=img; i<numrows*numcolumns; ++i,++pix) {
-            if (*pix<mini)
-                mini=*pix;
-        }
-    }
-    // if maxi==0 then we compute maximum
-    if (maxi==0) {
-        maxi = *img;
-        for (i=0,pix=img; i<numrows*numcolumns; ++i,++pix) {
-            if (*pix>maxi)
-                maxi=*pix;
-        }
-    }
-    // Compute delta value for display
-    delta = maxi-mini;
-    delta = delta / NUM_ASCII_DISP_CHARS;
-
-    // This portion can be deleted eventually...
-    uint8_t debugstring[100];
-    sprintf(debugstring,"maxi=%d mini=%d delta=%d\n",maxi,mini,delta);
-    Serial.print(debugstring);
-
-    // Loop through and dump image
-    pix=img;
-    for (m=0; m<numrows; ++m) {
-        for (n=0; n<numcolumns; ++n) {
-            // rescale pixel value to 0...9
-            i = *pix - mini;
-            i = i / delta;
-            if (i<0)
-                i=0;
-            if (i>9)
-                i=9;
-            // print
-            Serial.print(ASCII_DISP_CHARS[i]);
-            // next pixel
-            pix++;
-        }
-        Serial.println(" ");
-    }
-}
-#endif
-
 /*------------------------------------------------------------------------
   ImgShortDumpMatlabSerial -- Dumps image to the screen in a manner
   that may be copied into MATLAB.
@@ -245,12 +194,14 @@ img: input image
 numrows,numcolumns: number of rows and columns in image
 STATUS: UNTESTED
  */  
-void ImgShortDumpMatlabSerial(uint16_t *img,  uint8_t numrows,  uint8_t numcols) {
+void ImgShortDumpMatlabSerial(uint16_t *img,  uint8_t numrows,  uint8_t numcols) 
+{
     uint16_t *pimg = img;
-     uint8_t row,col;
+
     PRINTSTR("Dat = [\n");
-    for (row=0; row<numrows; ++row) {
-        for (col=0; col<numcols; ++col) {
+
+    for (uint8_t row=0; row<numrows; ++row) {
+        for (uint8_t col=0; col<numcols; ++col) {
             PRINTSHORT(*pimg);
             PRINTSTR(" ");
             pimg++;
@@ -275,13 +226,15 @@ mini,maxi: pointers to output variables that will contain the minimum
 and maximum pixel values
 STATUS: UNTESTED
  */  
-void ImgShortFindMinMax(uint16_t *img,  uint8_t numrows,  uint8_t numcols, uint16_t *mini, uint16_t *maxi) {
+void ImgShortFindMinMax(uint16_t *img,  uint8_t numrows,  uint8_t numcols, uint16_t *mini, uint16_t *maxi) 
+{
     uint16_t *pimg=img;
-     uint8_t row,col;
+
     *mini = 0xFFFF; // initialize
     *maxi = 0x0000; // initialize
-    for (row=0; row<numrows; ++row)
-        for (col=0; col<numcols; ++col) {
+
+    for (uint8_t row=0; row<numrows; ++row)
+        for (uint8_t col=0; col<numcols; ++col) {
             if (*pimg<*mini)
                 *mini=*pimg;
             if (*pimg>*maxi)
@@ -301,15 +254,15 @@ polarity: 0=find maximum, 1=find minimum
 winrow,wincol: row and column of winning pixel
 STATUS: UNTESTED
  */ 
-void ImgShortFindMax(uint16_t *img,  uint8_t numrows,  uint8_t numcols,  uint8_t polarity,  uint8_t *winrow,  uint8_t *wincol) {
-    uint16_t *pimg=img,val,bestval;
-     uint8_t row,col;
+void ImgShortFindMax(uint16_t *img,  uint8_t numrows,  uint8_t numcols,  uint8_t polarity,  uint8_t *winrow,  uint8_t *wincol) 
+{
 
-    bestval=0;
+    uint16_t *pimg = img;
+    uint16_t bestval = 0;
 
-    for (row=0; row<numrows; ++row)
-        for (col=0; col<numcols; ++col) {
-            val = *pimg;
+    for (uint8_t row=0; row<numrows; ++row)
+        for (uint8_t col=0; col<numcols; ++col) {
+            uint16_t val = *pimg;
             if (polarity)
                 val = 5000-val;
             if (val>bestval) {
@@ -329,13 +282,13 @@ numpix: number of pixels e.g. rows * columns
 OUTPUT: minimum pixel value
 STATUS: UNTESTED
  */
-uint16_t ImgShortMin(uint16_t *A,  uint16_t numpix) {
-    uint16_t *pa = A;
-    uint16_t minval;
-     uint16_t pixnum;
+uint16_t ImgShortMin(uint16_t *A,  uint16_t numpix) 
+{
 
-    minval = *A;
-    for (pixnum=0; pixnum<numpix; ++pixnum) {
+    uint16_t *pa = A;
+    uint16_t minval = *A;
+
+    for (uint16_t pixnum=0; pixnum<numpix; ++pixnum) {
         if (*pa < minval)
             minval = *pa;
         ++pa;
@@ -351,13 +304,13 @@ numpix: number of pixels e.g. rows * columns
 OUTPUT: maximum pixel value
 STATUS: UNTESTED
  */
-uint16_t ImgShortMax(uint16_t *A,  uint16_t numpix) {
+uint16_t ImgShortMax(uint16_t *A,  uint16_t numpix) 
+{
     uint16_t *pa = A;
     uint16_t maxval;
-     uint16_t pixnum;
 
     maxval = *A;
-    for (pixnum=0; pixnum<numpix; ++pixnum) {
+    for (uint16_t pixnum=0; pixnum<numpix; ++pixnum) {
         if (*pa > maxval)
             maxval = *pa;
         ++pa;
@@ -378,11 +331,13 @@ D: output image containing A-B
 numpix: number of pixels e.g. rows * columns
 STATUS: UNTESTED
  */
-void ImgShortDiff(uint16_t *A, uint16_t *B, uint16_t *D,  uint16_t numpix) {
-    uint16_t *pa,*pb,*pd;
-    pa=A; pb=B; pd=D;
-     uint16_t pixnum;
-    for (pixnum=0; pixnum<numpix; pixnum++) {
+void ImgShortDiff(uint16_t *A, uint16_t *B, uint16_t *D,  uint16_t numpix) 
+{
+    uint16_t *pa = A;
+    uint16_t *pb = B;
+    uint16_t *pd = D;
+
+    for (uint16_t pixnum=0; pixnum<numpix; pixnum++) {
         *pd = *pa - *pb;
         pa++;
         pb++;
@@ -402,10 +357,13 @@ numpix: number of pixels e.g. rows * columns
 shiftalpha: shifting amount used to implement time constant
 STATUS: UNTESTED
  */
-void ImgShortHPF(uint16_t *I, uint16_t *L, uint16_t *H, uint16_t numpix, uint8_t shiftalpha) {
-    uint16_t pix,*pi,*pl,*ph;
-    pi=I; pl=L; ph=H;
-    for (pix=0; pix<numpix; ++pix) {
+void ImgShortHPF(uint16_t *I, uint16_t *L, uint16_t *H, uint16_t numpix, uint8_t shiftalpha) 
+{
+    uint16_t * pi = I; 
+    uint16_t * pl = L; 
+    uint16_t * ph = H;
+
+    for (uint16_t pix=0; pix<numpix; ++pix) {
         // update lowpass
         uint16_t indiff = (*pi << 4) - *pl ;
         indiff = indiff >> shiftalpha;
@@ -432,12 +390,12 @@ numpix: number of pixels e.g. rows * columns
 mult: multiplier
 STATUS: UNTESTED
  */
-void ImgShortAddCharFPN(uint16_t *A,  uint8_t *F,  uint16_t numpix,  uint8_t mult) {
-    uint16_t *pa=A;
-     uint8_t *pf=F;
-     uint16_t pixnum;
+void ImgShortAddCharFPN(uint16_t *A,  uint8_t *F,  uint16_t numpix,  uint8_t mult) 
+{
+    uint16_t * pa = A;
+    uint8_t  * pf = F;
 
-    for (pixnum=0; pixnum<numpix; ++pixnum) {
+    for (uint16_t pixnum=0; pixnum<numpix; ++pixnum) {
         *pa += ((uint16_t)(*pf))*mult;
         pa++;
         pf++;
@@ -450,7 +408,7 @@ void ImgShortAddCharFPN(uint16_t *A,  uint8_t *F,  uint16_t numpix,  uint8_t mul
   passed images so that when there is no motion there is still some 
   texture so that motion sensing algorithms measure zero motion. Yes, this
   is a bit of a kludge... The fixed pattern noise is stored as
-   uint8_ts to make room. Parameter "modval" determines the strength
+  uint8_ts to make room. Parameter "modval" determines the strength
   of the FPN.
 VARIABLES:
 F: output image
@@ -459,11 +417,11 @@ modval: number of levels in the image, e.g. 2 makes a binary image,
 3 makes an image having values 0,1,2, and so on.
 STATUS: UNTESTED
  */
-void ImgCharMakeFPN( uint8_t *F,  uint16_t numpix,  uint8_t modval) {
-     uint8_t *pf = F;
-     uint16_t pixnum;
+void ImgCharMakeFPN( uint8_t *F,  uint16_t numpix,  uint8_t modval) 
+{
+    uint8_t *pf = F;
 
-    for (pixnum=0; pixnum<numpix; ++pixnum) {
+    for (uint16_t pixnum=0; pixnum<numpix; ++pixnum) {
         *pf = (uint8_t)(RANDOM(modval) );
         pf++;
     }
@@ -474,11 +432,11 @@ void ImgCharMakeFPN( uint8_t *F,  uint16_t numpix,  uint8_t modval) {
 //========================================================================
 
 /*------------------------------------------------------------------------
-  SubwinShort2D -- Extracts a 2D subwindow from a 2D image of uint16_ts. 
+  SubwinShort2D -- Extracts a 2D subwindow from a 2D image of short unsigned integers. 
 VARIABLES:
 I: input image
 S: output image
-Irows,Icols: number of rows and columns of I
+Icols: number of columns of I
 subrow,subcol: row and column of upper left pixel of subwindow
 startrow: starting row of window
 numrows: number of rows of subwindow
@@ -486,15 +444,20 @@ startcol: starting column of window
 numcols: number of columns of subwindow
 STATUS: UNTESTED
  */
-void SubwinShort2D(uint16_t *I, uint16_t *S, uint8_t Irows, uint8_t Icols, uint8_t startrow, uint8_t numrows, uint8_t startcol, uint8_t numcols) {
-    (void)Irows;
-    uint16_t *pi,*ps;
-    uint8_t r,c;
+void SubwinShort2D(
+        uint16_t *I, 
+        uint16_t *S, 
+        uint8_t Icols, 
+        uint8_t startrow, 
+        uint8_t numrows, 
+        uint8_t startcol, 
+        uint8_t numcols) 
+{
+    uint16_t * ps = S;
 
-    ps = S;
-    for (r=0; r<numrows; ++r) {
-        pi = I + Icols*(startrow+r) + startcol;
-        for (c=0; c<numcols; ++c) {
+    for (uint8_t r=0; r<numrows; ++r) {
+        uint16_t * pi = I + Icols*(startrow+r) + startcol;
+        for (uint8_t c=0; c<numcols; ++c) {
             *ps = *pi;
             ps++;
             pi++;
@@ -511,7 +474,7 @@ void SubwinShort2D(uint16_t *I, uint16_t *S, uint8_t Irows, uint8_t Icols, uint8
 VARIABLES:
 I: input image
 S: output image
-Irows,Icols: number of rows and columns of I
+Icols: number of columns of I
 subrow,subcol: row and column of upper left pixel of subwindow
 Snumpix: number of pixels in resulting 1D image
 Spixlength: length of virtual "rectangles" used to implement super pixels
@@ -519,8 +482,15 @@ orientation: 1 means rectangles are horizontal, e.g. window is averaged
 row-wise, 2 means rectangles ore vertical.
 STATUS: UNTESTED
  */
-void SubwinShort2Dto1D(uint16_t *I, uint16_t *S, uint8_t Irows, uint8_t Icols, uint8_t subrow, uint8_t subcol, uint8_t Snumpix, uint8_t Spixlength, uint8_t orientation) {
-    (void)Irows;
+void SubwinShort2Dto1D(
+        uint16_t *I, 
+        uint16_t *S, 
+        uint8_t Icols, 
+        uint8_t subrow, 
+        uint8_t subcol, 
+        uint8_t Snumpix, 
+        uint8_t Spixlength, 
+        uint8_t orientation) {
 
     // first clear image S
     for (uint8_t r=0; r<Snumpix; ++r) {

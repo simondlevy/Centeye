@@ -78,42 +78,45 @@ void GUIClient::stop(void)
 void GUIClient::getCommand(char *command, int *argument) 
 {
     char cmdbuf[11];
-    unsigned char i;
 
     // initialize
     for (uint8_t i=0; i<11; ++i)
         cmdbuf[i] = 0;
+
     // delay to ensure that all stuff is sent through serial port
     delay(100);
-    i = 0;
+
     // load cmdbuf
     for (uint8_t i=0; i<10 && Serial.available(); ++i) {
         cmdbuf[i] = Serial.read();
     }
+
     // clear end of array
     cmdbuf[10]=0;
+
     // clear rest of buffer
     while (Serial.available())
-    ;
-  // get command
-  *command = cmdbuf[0];
-  // get argument
-  sscanf(cmdbuf+1,"%d",argument);
+        ;
 
+    // get command
+    *command = cmdbuf[0];
 
-// Turns on or off GUI mode. USE ONLY WHEN CONNECTED TO PROCESSING GUI
-// Otherwise you'll get a lot of gobblygook on the serial monitor...
-   if(*command=='!')
-   {
-      if(*argument==0) {
-        stop();
-        Serial.println("Arduino Out! GUI off");
-      }
-      if(*argument==1) {
-        start();
-        Serial.println("Arduino Here! GUI on");
-      }
-   }        
+    // get argument
+    sscanf(cmdbuf+1,"%d",argument);
+
+    // Turns on or off GUI mode. USE ONLY WHEN CONNECTED TO PROCESSING GUI
+    // Otherwise you'll get a lot of gobblygook on the serial monitor...
+    if(*command=='!')
+    {
+        if(*argument==0) {
+            stop();
+            Serial.println("Arduino Out! GUI off");
+        }
+        if(*argument==1) {
+            start();
+            Serial.println("Arduino Here! GUI on");
+        }
+    }        
 }
 
 /*********************************************************************/
@@ -124,8 +127,8 @@ void GUIClient::getCommand(char *command, int *argument)
 
 void GUIClient::sendEscChar(uint8_t char_out)
 { 
-  Serial.write(ESC);		//send escape char
-  Serial.write(char_out);	//send special char
+    Serial.write(ESC);		//send escape char
+    Serial.write(char_out);	//send special char
 }
 
 /*********************************************************************/
@@ -137,13 +140,13 @@ void GUIClient::sendEscChar(uint8_t char_out)
 
 void GUIClient::sendDataByte(uint8_t data_out)
 {
-  if(data_out!=ESC)
-	Serial.write(data_out);		//send data uint8_t
-  else
-  {
-	Serial.write(data_out);		//duplicate escape character
-	Serial.write(data_out);
-  }
+    if(data_out!=ESC)
+        Serial.write(data_out);		//send data uint8_t
+    else
+    {
+        Serial.write(data_out);		//duplicate escape character
+        Serial.write(data_out);
+    }
 
 }
 
@@ -161,32 +164,32 @@ void GUIClient::sendDataByte(uint8_t data_out)
 void GUIClient::sendImage(uint8_t rows,uint8_t cols,uint16_t *pixels, uint16_t size)
 {
 
-  union	//to get the signed uint8_ts to format properly, use a union
-  {	
-   uint16_t i_out;
-   uint8_t b[2];
-  }u;
-  
-  if(detected)	//if GUI is detected, send uint8_ts
-  {
-  	sendEscChar(START);	//send start packet
-  
-  	sendDataByte(IMAGE);		//write image header
-  	sendDataByte(rows);		//write rows of image
-  	sendDataByte(cols);		//write cols of image
-  	
-	//for some reason, Serial.write(uint8_t_array,num)
-	//doesn't work over a certain number of uint8_ts
-	//so send uint8_ts one at a time
-	for (uint16_t i=0;i<size;i++)	
-	{
-	  u.i_out=pixels[i];		//put two uint8_ts into union
-	  sendDataByte(u.b[0]);	//send first uint8_t 
-	  sendDataByte(u.b[1]);	//send second uint8_t
- 	}
-  
-  	sendEscChar(STOP);		//send stop packet
-  }
+    union	//to get the signed uint8_ts to format properly, use a union
+    {	
+        uint16_t i_out;
+        uint8_t b[2];
+    }u;
+
+    if(detected)	//if GUI is detected, send uint8_ts
+    {
+        sendEscChar(START);	//send start packet
+
+        sendDataByte(IMAGE);		//write image header
+        sendDataByte(rows);		//write rows of image
+        sendDataByte(cols);		//write cols of image
+
+        //for some reason, Serial.write(uint8_t_array,num)
+        //doesn't work over a certain number of uint8_ts
+        //so send uint8_ts one at a time
+        for (uint16_t i=0;i<size;i++)	
+        {
+            u.i_out=pixels[i];		//put two uint8_ts into union
+            sendDataByte(u.b[0]);	//send first uint8_t 
+            sendDataByte(u.b[1]);	//send second uint8_t
+        }
+
+        sendEscChar(STOP);		//send stop packet
+    }
 
 }
 
@@ -202,27 +205,27 @@ void GUIClient::sendImage(uint8_t rows,uint8_t cols,uint16_t *pixels, uint16_t s
 /*********************************************************************/
 
 void GUIClient::sendImage(uint8_t rows,uint8_t cols,char *pixels,
-					  uint16_t size)
+        uint16_t size)
 {
 
-  if(detected)	//if GUI is detected, send uint8_ts
-  {
-  	sendEscChar(START);	//send start packet
-  
-  	sendDataByte(IMAGE_CHAR);		//write image header
-  	sendDataByte(rows);		//write rows of image
-  	sendDataByte(cols);		//write cols of image
-  	
-	//for some reason, Serial.write(uint8_t_array,num)
-	//doesn't work over a certain number of uint8_ts
-	//so send uint8_ts one at a time
-	for (uint16_t i=0;i<size;i++)	
-	{
-	  sendDataByte((uint8_t)pixels[i]);	//send first uint8_t 
- 	}
-  
-  	sendEscChar(STOP);		//send stop packet
-  }
+    if(detected)	//if GUI is detected, send uint8_ts
+    {
+        sendEscChar(START);	//send start packet
+
+        sendDataByte(IMAGE_CHAR);		//write image header
+        sendDataByte(rows);		//write rows of image
+        sendDataByte(cols);		//write cols of image
+
+        //for some reason, Serial.write(uint8_t_array,num)
+        //doesn't work over a certain number of uint8_ts
+        //so send uint8_ts one at a time
+        for (uint16_t i=0;i<size;i++)	
+        {
+            sendDataByte((uint8_t)pixels[i]);	//send first uint8_t 
+        }
+
+        sendEscChar(STOP);		//send stop packet
+    }
 }
 
 /*********************************************************************/
@@ -245,32 +248,32 @@ void GUIClient::sendImage(uint8_t rows,uint8_t cols,char *pixels,
 void GUIClient::sendVectors(uint8_t rows,uint8_t cols,uint16_t *vector,uint16_t num_vectors)
 { 
 
-  union
-  {	//to get the signed uint8_ts to format properly, use a union
-   uint16_t i_out;
-   uint8_t b[2];
-  }u;
+    union
+    {	//to get the signed uint8_ts to format properly, use a union
+        uint16_t i_out;
+        uint8_t b[2];
+    }u;
 
-  if(detected)	//if GUI is detected, send uint8_ts
-  {
-  	sendEscChar(START);		//send start packet
+    if(detected)	//if GUI is detected, send uint8_ts
+    {
+        sendEscChar(START);		//send start packet
 
-  	sendDataByte(VECTORS_SHORT);		//send vector header
-  	sendDataByte(rows);			//send rows of vectors
-  	sendDataByte(cols);			//send cols of vectors
+        sendDataByte(VECTORS_SHORT);		//send vector header
+        sendDataByte(rows);			//send rows of vectors
+        sendDataByte(cols);			//send cols of vectors
 
-  	for (uint16_t i=0;i<num_vectors*2;i+=2)
-	{
-	  u.i_out=vector[i];		//put two uint8_ts into union
-	  sendDataByte(u.b[0]);	//send first uint8_t 
-	  sendDataByte(u.b[1]);	//send second uint8_t
-	  u.i_out=vector[i+1];		//put two uint8_ts into union
-	  sendDataByte(u.b[0]);	//send first uint8_t 
-	  sendDataByte(u.b[1]);	//send second uint8_t
-	}
+        for (uint16_t i=0;i<num_vectors*2;i+=2)
+        {
+            u.i_out=vector[i];		//put two uint8_ts into union
+            sendDataByte(u.b[0]);	//send first uint8_t 
+            sendDataByte(u.b[1]);	//send second uint8_t
+            u.i_out=vector[i+1];		//put two uint8_ts into union
+            sendDataByte(u.b[0]);	//send first uint8_t 
+            sendDataByte(u.b[1]);	//send second uint8_t
+        }
 
-  	sendEscChar(STOP);			//send stop packet
-  }
+        sendEscChar(STOP);			//send stop packet
+    }
 }
 
 /*********************************************************************/
@@ -293,22 +296,22 @@ void GUIClient::sendVectors(uint8_t rows,uint8_t cols,uint16_t *vector,uint16_t 
 void GUIClient::sendVectors(uint8_t rows,uint8_t cols, int8_t *vector, uint16_t num_vectors)
 { 
 
-  if(detected)	//if GUI is detected, send uint8_ts
-  {
-  	sendEscChar(START);		//send start packet
+    if(detected)	//if GUI is detected, send uint8_ts
+    {
+        sendEscChar(START);		//send start packet
 
-  	sendDataByte(VECTORS);		//send vector header
-  	sendDataByte(rows);			//send rows of vectors
-  	sendDataByte(cols);			//send cols of vectors
+        sendDataByte(VECTORS);		//send vector header
+        sendDataByte(rows);			//send rows of vectors
+        sendDataByte(cols);			//send cols of vectors
 
-  	for (uint16_t i=0;i<num_vectors*2;i+=2)
-	{
-	  sendDataByte((uint8_t)vector[i]);
-	  sendDataByte((uint8_t)vector[i+1]);
-	}
+        for (uint16_t i=0;i<num_vectors*2;i+=2)
+        {
+            sendDataByte((uint8_t)vector[i]);
+            sendDataByte((uint8_t)vector[i+1]);
+        }
 
-  	sendEscChar(STOP);			//send stop packet
-  }
+        sendEscChar(STOP);			//send stop packet
+    }
 }
 
 /*********************************************************************/
@@ -329,21 +332,21 @@ void GUIClient::sendVectors(uint8_t rows,uint8_t cols, int8_t *vector, uint16_t 
 
 void GUIClient::sendPoints(uint8_t rows, uint8_t cols, uint8_t *points, uint16_t num_points)
 { 
-  if(detected)	//if GUI is detected, send uint8_ts
-  {
- 	sendEscChar(START);		//send start packet
-	
- 	sendDataByte(POINTS);			//send points header
- 	sendDataByte(rows);			//send rows of image
- 	sendDataByte(cols);			//send cols of image
-	
-	for (uint16_t i=0;i<num_points*2;i+=2)
-	{
-	  sendDataByte(points[i]);		//send point row
-	  sendDataByte(points[i+1]);		//send point col
-	}
-  
-  	sendEscChar(STOP);			//send stop packet
-  }
+    if(detected)	//if GUI is detected, send uint8_ts
+    {
+        sendEscChar(START);		//send start packet
+
+        sendDataByte(POINTS);			//send points header
+        sendDataByte(rows);			//send rows of image
+        sendDataByte(cols);			//send cols of image
+
+        for (uint16_t i=0;i<num_points*2;i+=2)
+        {
+            sendDataByte(points[i]);		//send point row
+            sendDataByte(points[i+1]);		//send point col
+        }
+
+        sendEscChar(STOP);			//send stop packet
+    }
 
 }

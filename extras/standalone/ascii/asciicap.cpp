@@ -8,6 +8,7 @@ Requires: OpenCV
 
 #include <opencv2/opencv.hpp>
 #include <ImageUtils.h>
+#include <stdint.h>
 
 static const int W = 80;
 static const int H = 60;
@@ -43,7 +44,7 @@ int main(int argc, char** argv)
         cv::resize(gray, small, cv::Size(W,H), 0, 0);
 
         // Copy scaled-down grayscale to short ints
-        short shortimage[W*H];
+        uint16_t shortimage[W*H];
         for (int k=0; k<W*H; ++k) {
             shortimage[k] = small.data[k];
         }
