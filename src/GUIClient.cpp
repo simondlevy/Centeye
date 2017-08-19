@@ -52,7 +52,7 @@ GUIClient::GUIClient(void)
 
 void GUIClient::start(void)
 {
-    detected=1;	//GUI detected
+    detected=true;	//GUI detected
 }
 
 /*********************************************************************/
@@ -62,7 +62,7 @@ void GUIClient::start(void)
 
 void GUIClient::stop(void)
 {
-    detected=0;	//GUI not detected
+    detected=false;	//GUI not detected
 }
 
 /*********************************************************************/
@@ -81,15 +81,14 @@ void GUIClient::getCommand(char *command, int *argument)
     unsigned char i;
 
     // initialize
-    for (i=0; i<11; ++i)
+    for (uint8_t i=0; i<11; ++i)
         cmdbuf[i] = 0;
-    i = 0;
     // delay to ensure that all stuff is sent through serial port
     delay(100);
+    i = 0;
     // load cmdbuf
-    while (Serial.available() && i<10) {
+    for (uint8_t i=0; i<10 && Serial.available(); ++i) {
         cmdbuf[i] = Serial.read();
-        i++;
     }
     // clear end of array
     cmdbuf[10]=0;
@@ -159,8 +158,7 @@ void GUIClient::sendDataByte(uint8_t data_out)
 //	size: number of pixels in image (rows*cols)
 /*********************************************************************/
 
-void GUIClient::sendImage(uint8_t rows,uint8_t cols,uint16_t *pixels,
-					  uint16_t size)
+void GUIClient::sendImage(uint8_t rows,uint8_t cols,uint16_t *pixels, uint16_t size)
 {
 
   union	//to get the signed uint8_ts to format properly, use a union
@@ -180,7 +178,7 @@ void GUIClient::sendImage(uint8_t rows,uint8_t cols,uint16_t *pixels,
 	//for some reason, Serial.write(uint8_t_array,num)
 	//doesn't work over a certain number of uint8_ts
 	//so send uint8_ts one at a time
-	for(int i=0;i<size;i++)	
+	for (uint16_t i=0;i<size;i++)	
 	{
 	  u.i_out=pixels[i];		//put two uint8_ts into union
 	  sendDataByte(u.b[0]);	//send first uint8_t 
@@ -218,7 +216,7 @@ void GUIClient::sendImage(uint8_t rows,uint8_t cols,char *pixels,
 	//for some reason, Serial.write(uint8_t_array,num)
 	//doesn't work over a certain number of uint8_ts
 	//so send uint8_ts one at a time
-	for(int i=0;i<size;i++)	
+	for (uint16_t i=0;i<size;i++)	
 	{
 	  sendDataByte((uint8_t)pixels[i]);	//send first uint8_t 
  	}
@@ -261,7 +259,7 @@ void GUIClient::sendVectors(uint8_t rows,uint8_t cols,uint16_t *vector,uint16_t 
   	sendDataByte(rows);			//send rows of vectors
   	sendDataByte(cols);			//send cols of vectors
 
-  	for(int i=0;i<num_vectors*2;i+=2)
+  	for (uint16_t i=0;i<num_vectors*2;i+=2)
 	{
 	  u.i_out=vector[i];		//put two uint8_ts into union
 	  sendDataByte(u.b[0]);	//send first uint8_t 
@@ -303,7 +301,7 @@ void GUIClient::sendVectors(uint8_t rows,uint8_t cols, int8_t *vector, uint16_t 
   	sendDataByte(rows);			//send rows of vectors
   	sendDataByte(cols);			//send cols of vectors
 
-  	for(int i=0;i<num_vectors*2;i+=2)
+  	for (uint16_t i=0;i<num_vectors*2;i+=2)
 	{
 	  sendDataByte((uint8_t)vector[i]);
 	  sendDataByte((uint8_t)vector[i+1]);
@@ -339,7 +337,7 @@ void GUIClient::sendPoints(uint8_t rows, uint8_t cols, uint8_t *points, uint16_t
  	sendDataByte(rows);			//send rows of image
  	sendDataByte(cols);			//send cols of image
 	
-	for(int i=0;i<num_points*2;i+=2)
+	for (uint16_t i=0;i<num_points*2;i+=2)
 	{
 	  sendDataByte(points[i]);		//send point row
 	  sendDataByte(points[i+1]);		//send point col
