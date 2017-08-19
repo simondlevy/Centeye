@@ -83,13 +83,13 @@ void ArduEyeSMH::begin(short vref,short nbias,short aobias, char selamp)
     init_pin(_incv);
 
     //clear all chip register values
-    clearValues();
+    clear_values();
 
     //set up biases
     setBiases(vref,nbias,aobias);
 
     //turn chip on with config value
-    setPointerValue(SMH_SYS_CONFIG,16);
+    set_pointer_value(SMH_SYS_CONFIG,16);
 
     //if amp is used, set useAmp variable
     if(selamp==1)
@@ -106,7 +106,7 @@ static void pulse(int pin)
     digitalWrite(pin, LOW);
 }
 
-void ArduEyeSMH::setPointer(char ptr)
+void ArduEyeSMH::set_pointer(char ptr)
 {
     // clear pointer
     pulse(_resp);
@@ -116,7 +116,7 @@ void ArduEyeSMH::setPointer(char ptr)
         pulse(_incp);
 }
 
-void ArduEyeSMH::setValue(short val) 
+void ArduEyeSMH::set_value(short val) 
 {
     // clear pointer
     pulse(_resv);
@@ -126,43 +126,43 @@ void ArduEyeSMH::setValue(short val)
         pulse(_incv);
 }
 
-void ArduEyeSMH::incValue(short val) 
+void ArduEyeSMH::inc_value(short val) 
 {
     for (short i=0; i<val; ++i) //increment pointer
         pulse(_incv);
 }
 
-void ArduEyeSMH::pulseInphi(char delay) 
+void ArduEyeSMH::pulse_inphi(char delay) 
 {
     (void)delay;
     pulse(_inphi);
 }
 
-void ArduEyeSMH::setPointerValue(char ptr,short val)
+void ArduEyeSMH::set_pointer_value(char ptr,short val)
 {
-    setPointer(ptr);	//set pointer to register
-    setValue(val);	//set value of that register
+    set_pointer(ptr);	//set pointer to register
+    set_value(val);	//set value of that register
 }
 
-void ArduEyeSMH::clearValues(void)
+void ArduEyeSMH::clear_values(void)
 {
     for (char i=0; i!=8; ++i)
-        setPointerValue(i,0);	//set each register to zero
+        set_pointer_value(i,0);	//set each register to zero
 }
 
 void  ArduEyeSMH::setVREF(short vref)
 {
-    setPointerValue(SMH_SYS_VREF,vref);
+    set_pointer_value(SMH_SYS_VREF,vref);
 }
 
 void  ArduEyeSMH::setNBIAS(short nbias)
 {
-    setPointerValue(SMH_SYS_NBIAS,nbias);
+    set_pointer_value(SMH_SYS_NBIAS,nbias);
 }
 
 void  ArduEyeSMH::setAOBIAS(short aobias)
 {
-    setPointerValue(SMH_SYS_AOBIAS,aobias);
+    set_pointer_value(SMH_SYS_AOBIAS,aobias);
 }
 
 void ArduEyeSMH::setBiasesVdd(char vddType)
@@ -173,18 +173,18 @@ void ArduEyeSMH::setBiasesVdd(char vddType)
     {
         case SMH1_VDD_5V0:	//chip receives 5V
         default:
-            setPointerValue(SMH_SYS_NBIAS,SMH_NBIAS_5V0);
-            setPointerValue(SMH_SYS_AOBIAS,SMH_AOBIAS_5V0);
-            setPointerValue(SMH_SYS_VREF,SMH_VREF_5V0);
+            set_pointer_value(SMH_SYS_NBIAS,SMH_NBIAS_5V0);
+            set_pointer_value(SMH_SYS_AOBIAS,SMH_AOBIAS_5V0);
+            set_pointer_value(SMH_SYS_VREF,SMH_VREF_5V0);
             break;
     }
 }
 
 void ArduEyeSMH::setBiases(short vref,short nbias,short aobias)
 {
-    setPointerValue(SMH_SYS_NBIAS,nbias);
-    setPointerValue(SMH_SYS_AOBIAS,aobias);
-    setPointerValue(SMH_SYS_VREF,vref);
+    set_pointer_value(SMH_SYS_NBIAS,nbias);
+    set_pointer_value(SMH_SYS_AOBIAS,aobias);
+    set_pointer_value(SMH_SYS_VREF,vref);
 }
 
 void ArduEyeSMH::setConfig(char gain, char selamp, char cvdda) 
@@ -199,7 +199,7 @@ void ArduEyeSMH::setConfig(char gain, char selamp, char cvdda)
     // Note that config will have the following form binary form:
     // 000csggg where c=cvdda, s=selamp, ggg=gain (3 bits)
     // Note that there is no overflow detection in the input values.
-    setPointerValue(SMH_SYS_CONFIG,config);
+    set_pointer_value(SMH_SYS_CONFIG,config);
 }
 
 void ArduEyeSMH::setAmpGain(char gain)
@@ -217,7 +217,7 @@ void ArduEyeSMH::setAmpGain(char gain)
         useAmp=0;	//bypassing amplifier
     }
 
-    setPointerValue(SMH_SYS_CONFIG,config);	//set config register
+    set_pointer_value(SMH_SYS_CONFIG,config);	//set config register
 }
 
 void ArduEyeSMH::setBinning(short hbin,short vbin)
@@ -255,8 +255,8 @@ void ArduEyeSMH::setBinning(short hbin,short vbin)
     }
 
     //set switching registers
-    setPointerValue(SMH_SYS_HSW,hsw);
-    setPointerValue(SMH_SYS_VSW,vsw);
+    set_pointer_value(SMH_SYS_HSW,hsw);
+    set_pointer_value(SMH_SYS_VSW,vsw);
 }
 
 void ArduEyeSMH::calcMask(short *img, short size, uint8_t *mask,short *mask_base)
@@ -325,13 +325,13 @@ void ArduEyeSMH::get_image(
     uint8_t row,col;
 
     // Go to first row
-    setPointerValue(SMH_SYS_ROWSEL,rowstart);
+    set_pointer_value(SMH_SYS_ROWSEL,rowstart);
 
     // Loop through all rows
     for (row=0; row<numrows; ++row) {
 
         // Go to first column
-        setPointerValue(SMH_SYS_COLSEL,colstart);
+        set_pointer_value(SMH_SYS_COLSEL,colstart);
 
         // Loop through all columns
         for (col=0; col<numcols; ++col) {
@@ -341,7 +341,7 @@ void ArduEyeSMH::get_image(
 
             // pulse amplifier if needed
             if (useAmp) 
-                pulseInphi(2);
+                pulse_inphi(2);
 
             // get data value
             delayMicroseconds(1);
@@ -350,10 +350,10 @@ void ArduEyeSMH::get_image(
 
             *pimg = val; // store pixel
             pimg++; // advance pointer
-            incValue(colskip); // go to next column
+            inc_value(colskip); // go to next column
         }
-        setPointer(SMH_SYS_ROWSEL);
-        incValue(rowskip); // go to next row
+        set_pointer(SMH_SYS_ROWSEL);
+        inc_value(rowskip); // go to next row
     }
 }
 
@@ -401,13 +401,13 @@ void ArduEyeSMH::get_image_row_sum(
     uint8_t row,col;
 
     // Go to first row
-    setPointerValue(SMH_SYS_ROWSEL,rowstart);
+    set_pointer_value(SMH_SYS_ROWSEL,rowstart);
 
     // Loop through all rows
     for (row=0; row<numrows; ++row) {
 
         // Go to first column
-        setPointerValue(SMH_SYS_COLSEL,colstart);
+        set_pointer_value(SMH_SYS_COLSEL,colstart);
 
         total=0;
 
@@ -419,7 +419,7 @@ void ArduEyeSMH::get_image_row_sum(
 
             // pulse amplifier if needed
             if (useAmp) 
-                pulseInphi(2);
+                pulse_inphi(2);
 
             // get data value
             delayMicroseconds(1);
@@ -427,14 +427,14 @@ void ArduEyeSMH::get_image_row_sum(
             val = analogRead(input); // acquire pixel
 
             total+=val;	//sum values along row
-            incValue(colskip); // go to next column
+            inc_value(colskip); // go to next column
         }
 
         *pimg = total>>4; // store pixel divide to avoid overflow
         pimg++; // advance pointer
 
-        setPointer(SMH_SYS_ROWSEL);
-        incValue(rowskip); // go to next row
+        set_pointer(SMH_SYS_ROWSEL);
+        inc_value(rowskip); // go to next row
     }
 }
 
@@ -482,13 +482,13 @@ void ArduEyeSMH::get_image_col_sum(
     uint8_t row,col;
 
     // Go to first col
-    setPointerValue(SMH_SYS_COLSEL,colstart);
+    set_pointer_value(SMH_SYS_COLSEL,colstart);
 
     // Loop through all cols
     for (col=0; col<numcols; ++col) {
 
         // Go to first row
-        setPointerValue(SMH_SYS_ROWSEL,rowstart);
+        set_pointer_value(SMH_SYS_ROWSEL,rowstart);
 
         total=0;
 
@@ -500,7 +500,7 @@ void ArduEyeSMH::get_image_col_sum(
 
             // pulse amplifier if needed
             if (useAmp) 
-                pulseInphi(2);
+                pulse_inphi(2);
 
             // get data value
             delayMicroseconds(1);
@@ -508,14 +508,14 @@ void ArduEyeSMH::get_image_col_sum(
             val = analogRead(input); // acquire pixel
 
             total+=val;	//sum value along column
-            incValue(rowskip); // go to next row
+            inc_value(rowskip); // go to next row
         }
 
         *pimg = total>>4; // store pixel
         pimg++; // advance pointer
 
-        setPointer(SMH_SYS_COLSEL);
-        incValue(colskip); // go to next col
+        set_pointer(SMH_SYS_COLSEL);
+        inc_value(colskip); // go to next col
     }
 }
 
@@ -566,13 +566,13 @@ void ArduEyeSMH::find_max(
     uint8_t row,col,bestrow=0,bestcol=0;
 
     // Go to first row
-    setPointerValue(SMH_SYS_ROWSEL,rowstart);
+    set_pointer_value(SMH_SYS_ROWSEL,rowstart);
 
     // Loop through all rows
     for (row=0; row<numrows; ++row) {
 
         // Go to first column
-        setPointerValue(SMH_SYS_COLSEL,colstart);
+        set_pointer_value(SMH_SYS_COLSEL,colstart);
 
         // Loop through all columns
         for (col=0; col<numcols; ++col) {
@@ -582,7 +582,7 @@ void ArduEyeSMH::find_max(
 
             // pulse amplifier if needed
             if (useAmp) 
-                pulseInphi(2);
+                pulse_inphi(2);
 
             // get data value
             delayMicroseconds(1);
@@ -608,10 +608,10 @@ void ArduEyeSMH::find_max(
                 }
             }
 
-            incValue(colskip); // go to next column
+            inc_value(colskip); // go to next column
         }
-        setPointer(SMH_SYS_ROWSEL);
-        incValue(rowskip); // go to next row
+        set_pointer(SMH_SYS_ROWSEL);
+        inc_value(rowskip); // go to next row
     }
 
     *max_row = bestrow;
@@ -636,15 +636,15 @@ void ArduEyeSMH::chip_to_matlab(uint8_t input, bool use_digital)
     unsigned short val;
 
     Serial.println("Img = [");
-    setPointerValue(SMH_SYS_ROWSEL,0); // set row = 0
+    set_pointer_value(SMH_SYS_ROWSEL,0); // set row = 0
     for (row=0; row<112; ++row) {
-        setPointerValue(SMH_SYS_COLSEL,0); // set column = 0
+        set_pointer_value(SMH_SYS_COLSEL,0); // set column = 0
         for (col=0; col<112; ++col) {
             // settling delay
             delayMicroseconds(1);
             // pulse amplifier if needed
             if (useAmp) 
-                pulseInphi(2);
+                pulse_inphi(2);
 
             // get data value
             delayMicroseconds(1);
@@ -652,12 +652,12 @@ void ArduEyeSMH::chip_to_matlab(uint8_t input, bool use_digital)
             val = analogRead(input); // acquire pixel
 
             // increment column
-            incValue(1);
+            inc_value(1);
             Serial.print(val);
             Serial.print(" ");
         }
-        setPointer(SMH_SYS_ROWSEL); // point to row
-        incValue(1); // increment row
+        set_pointer(SMH_SYS_ROWSEL); // point to row
+        inc_value(1); // increment row
         Serial.println(" ");
     }
     Serial.println("];");
@@ -703,11 +703,11 @@ void ArduEyeSMH::section_to_matlab(
     uint8_t row,col;
 
     Serial.println("Img = [");
-    setPointerValue(SMH_SYS_ROWSEL,rowstart);
+    set_pointer_value(SMH_SYS_ROWSEL,rowstart);
 
     for (row=0; row<numrows; row++) {
 
-        setPointerValue(SMH_SYS_COLSEL,colstart);
+        set_pointer_value(SMH_SYS_COLSEL,colstart);
 
         for (col=0; col<numcols; col++) {
             // settling delay
@@ -715,18 +715,18 @@ void ArduEyeSMH::section_to_matlab(
 
             // pulse amplifier if needed
             if (useAmp) 
-                pulseInphi(2);
+                pulse_inphi(2);
 
             delayMicroseconds(1);
 
             val = analogRead(input); // acquire pixel
 
-            incValue(colskip);
+            inc_value(colskip);
             Serial.print(val);
             Serial.print(" ");
         }
-        setPointer(SMH_SYS_ROWSEL);
-        incValue(rowskip); // go to next row
+        set_pointer(SMH_SYS_ROWSEL);
+        inc_value(rowskip); // go to next row
         Serial.println(" ");
     }
     Serial.println("];");

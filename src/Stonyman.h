@@ -508,41 +508,26 @@ class ArduEyeSMH
         /*********************************************************************/
         // Chip Register and Value Manipulation
 
-        //set pointer on chip
-        void setPointer(char ptr);
+        // Sets pointer on chip
+        void set_pointer(char ptr);
 
-        /*********************************************************************/
-        //	setValue
-        //	Sets the value of the current register
-        /*********************************************************************/
-        void setValue(short val);
+        // Sets value of current register
+        void set_value(short val);
 
-        /*********************************************************************/
-        //	incValue
         //	Sets the pointer system register to the desired value.  Value is
-        //	not reset so the current value must be taken into account
-        /*********************************************************************/
-        void incValue(short val);
+        //	not reset so the current value must be taken into account.
+        void inc_value(short val);
 
-        /*********************************************************************/
-        //	pulseInphi
         //	Operates the amplifier.  Sets inphi pin high, delays to allow
         //	value time to settle, and then brings it low.
-        /*********************************************************************/
-        void pulseInphi(char delay); 
+        void pulse_inphi(char delay); 
 
-        /*********************************************************************/
-        //	clearValues
         //	Resets the value of all registers to zero
-        /*********************************************************************/
-        void clearValues(void);
+        void clear_values(void);
 
-        /*********************************************************************/
-        //	setPointerValue
         //	Sets the pointer to a register and sets the value of that        
         //	register
-        /*********************************************************************/
-        void setPointerValue(char ptr,short val);
+        void set_pointer_value(char ptr,short val);
 };
 
 #endif
