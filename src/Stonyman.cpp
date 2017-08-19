@@ -106,23 +106,23 @@ void Stonyman::set_pointer(uint8_t ptr)
     pulse(_resp);
 
     // increment pointer to desired value
-    for (short i=0; i!=ptr; ++i) 
+    for (uint16_t i=0; i!=ptr; ++i) 
         pulse(_incp);
 }
 
-void Stonyman::set_value(short val) 
+void Stonyman::set_value(uint16_t val) 
 {
     // clear pointer
     pulse(_resv);
 
     // increment pointer
-    for (short i=0; i!=val; ++i) 
+    for (uint16_t i=0; i!=val; ++i) 
         pulse(_incv);
 }
 
-void Stonyman::inc_value(short val) 
+void Stonyman::inc_value(uint16_t val) 
 {
-    for (short i=0; i<val; ++i) //increment pointer
+    for (uint16_t i=0; i<val; ++i) //increment pointer
         pulse(_incv);
 }
 
@@ -132,7 +132,7 @@ void Stonyman::pulse_inphi(uint8_t delay)
     pulse(_inphi);
 }
 
-void Stonyman::set_pointer_value(uint8_t ptr,short val)
+void Stonyman::set_pointer_value(uint8_t ptr,uint16_t val)
 {
     set_pointer(ptr);	//set pointer to register
     set_value(val);	//set value of that register
@@ -183,7 +183,7 @@ void Stonyman::setBiases(uint8_t vref, uint8_t nbias, uint8_t aobias)
 
 void Stonyman::setConfig(uint8_t gain, uint8_t selamp, uint8_t cvdda) 
 {
-    short config=gain+(selamp*8)+(cvdda*16);	//form register value
+    uint16_t config=gain+(selamp*8)+(cvdda*16);	//form register value
 
     if(selamp==1)	//if selamp is 1, set use_amp variable to 1
         use_amp=1;
@@ -198,7 +198,7 @@ void Stonyman::setConfig(uint8_t gain, uint8_t selamp, uint8_t cvdda)
 
 void Stonyman::setAmpGain(uint8_t gain)
 {
-    short config;
+    uint16_t config;
 
     if((gain>0)&&(gain<8))	//if gain is a proper value, connect amp
     {
@@ -216,7 +216,7 @@ void Stonyman::setAmpGain(uint8_t gain)
 
 void Stonyman::setBinning(uint8_t hbin,uint8_t vbin)
 {
-    short hsw,vsw;
+    uint16_t hsw,vsw;
 
     switch (hbin) //horizontal binning
     {
@@ -253,7 +253,7 @@ void Stonyman::setBinning(uint8_t hbin,uint8_t vbin)
     set_pointer_value(SMH_SYS_VSW,vsw);
 }
 
-void Stonyman::calcMask(short *img, short size, uint8_t *mask,short *mask_base)
+void Stonyman::calcMask(uint16_t *img, uint16_t size, uint8_t *mask,uint16_t *mask_base)
 {
     *mask_base = 10000; // e.g. "high"
 
@@ -266,7 +266,7 @@ void Stonyman::calcMask(short *img, short size, uint8_t *mask,short *mask_base)
         mask[i] = img[i] - *mask_base;	//subtract min value for mask
 }
 
-void Stonyman::applyMask(short *img, short size, uint8_t *mask, short mask_base)
+void Stonyman::applyMask(uint16_t *img, uint16_t size, uint8_t *mask, uint16_t mask_base)
 {
     // Subtract calibration mask
     for (int i=0; i<size;++i) 
@@ -276,7 +276,7 @@ void Stonyman::applyMask(short *img, short size, uint8_t *mask, short mask_base)
     }
 }
 
-void Stonyman::getImageAnalog(short *img, 
+void Stonyman::getImageAnalog(uint16_t *img, 
         uint8_t rowstart, 
         uint8_t numrows, 
         uint8_t rowskip, 
@@ -288,7 +288,7 @@ void Stonyman::getImageAnalog(short *img,
     get_image(img, rowstart, numrows, rowskip, colstart, numcols, colskip, input, false);
 }
 
-void Stonyman::getImageDigital(short *img, 
+void Stonyman::getImageDigital(uint16_t *img, 
         uint8_t rowstart, 
         uint8_t numrows, 
         uint8_t rowskip, 
@@ -301,7 +301,7 @@ void Stonyman::getImageDigital(short *img,
 }
 
 void Stonyman::get_image(
-        short *img, 
+        uint16_t *img, 
         uint8_t rowstart, 
         uint8_t numrows, 
         uint8_t rowskip, 
@@ -314,8 +314,8 @@ void Stonyman::get_image(
     // XXX need to support digital (SPI) as well    
     (void)use_digital;
 
-    short *pimg = img; // pointer to output image array
-    short val;
+    uint16_t *pimg = img; // pointer to output image array
+    uint16_t val;
     uint8_t row,col;
 
     // Go to first row
@@ -352,7 +352,7 @@ void Stonyman::get_image(
 }
 
 void Stonyman::getImageRowSumAnalog(
-        short *img, 
+        uint16_t *img, 
         uint8_t rowstart, 
         uint8_t numrows, 
         uint8_t rowskip, 
@@ -365,7 +365,7 @@ void Stonyman::getImageRowSumAnalog(
 }
 
 void Stonyman::getImageRowSumDigital(
-        short *img, 
+        uint16_t *img, 
         uint8_t rowstart, 
         uint8_t numrows, 
         uint8_t rowskip, 
@@ -378,7 +378,7 @@ void Stonyman::getImageRowSumDigital(
 }
 
 void Stonyman::get_image_row_sum(
-        short *img, 
+        uint16_t *img, 
         uint8_t rowstart, 
         uint8_t numrows, 
         uint8_t rowskip, 
@@ -390,8 +390,8 @@ void Stonyman::get_image_row_sum(
 {
     (void)use_digital;
 
-    short *pimg = img; // pointer to output image array
-    short val,total=0;
+    uint16_t *pimg = img; // pointer to output image array
+    uint16_t val,total=0;
     uint8_t row,col;
 
     // Go to first row
@@ -433,7 +433,7 @@ void Stonyman::get_image_row_sum(
 }
 
 void Stonyman::getImageColSumAnalog(
-        short *img, 
+        uint16_t *img, 
         uint8_t rowstart, 
         uint8_t numrows, 
         uint8_t rowskip, 
@@ -446,7 +446,7 @@ void Stonyman::getImageColSumAnalog(
 }
 
 void Stonyman::getImageColSumDigital(
-        short *img, 
+        uint16_t *img, 
         uint8_t rowstart, 
         uint8_t numrows, 
         uint8_t rowskip, 
@@ -459,7 +459,7 @@ void Stonyman::getImageColSumDigital(
 }
     
 void Stonyman::get_image_col_sum(
-        short *img, 
+        uint16_t *img, 
         uint8_t rowstart, 
         uint8_t numrows, 
         uint8_t rowskip, 
@@ -471,8 +471,8 @@ void Stonyman::get_image_col_sum(
 {
     (void)use_digital;
 
-    short *pimg = img; // pointer to output image array
-    short val,total=0;
+    uint16_t *pimg = img; // pointer to output image array
+    uint16_t val,total=0;
     uint8_t row,col;
 
     // Go to first col
@@ -556,7 +556,7 @@ void Stonyman::find_max(
 {
     (void)use_digital;
 
-    unsigned short maxval=5000,minval=0,val;
+    uint16_t maxval=5000,minval=0,val;
     uint8_t row,col,bestrow=0,bestcol=0;
 
     // Go to first row
@@ -627,7 +627,7 @@ void Stonyman::chip_to_matlab(uint8_t input, bool use_digital)
     (void)use_digital;
 
     uint8_t row,col;
-    unsigned short val;
+    uint16_t val;
 
     Serial.println("Img = [");
     set_pointer_value(SMH_SYS_ROWSEL,0); // set row = 0
@@ -693,7 +693,7 @@ void Stonyman::section_to_matlab(
 {
     (void)use_digital;
 
-    short val;
+    uint16_t val;
     uint8_t row,col;
 
     Serial.println("Img = [");

@@ -66,15 +66,15 @@
 
 // recall from note above that image arrays are stored row-size in a 1D array
 
-static short img[MAX_PIXELS];         //1D image array
-static short row=MAX_ROWS;            //maximum rows allowed by memory
-static short col=MAX_COLS;            //maximum cols allowed by memory
-static short skiprow=SKIP_PIXELS;     //pixels to be skipped during readout because of downsampling
-static short skipcol=SKIP_PIXELS;     //pixels to be skipped during readout because of downsampling 
-static short sr=START_PIXEL;          //first pixel row to read
-static short sc=START_PIXEL;          //first pixel col to read
+static uint16_t img[MAX_PIXELS];         //1D image array
+static uint16_t row=MAX_ROWS;            //maximum rows allowed by memory
+static uint16_t col=MAX_COLS;            //maximum cols allowed by memory
+static uint16_t skiprow=SKIP_PIXELS;     //pixels to be skipped during readout because of downsampling
+static uint16_t skipcol=SKIP_PIXELS;     //pixels to be skipped during readout because of downsampling 
+static uint16_t sr=START_PIXEL;          //first pixel row to read
+static uint16_t sc=START_PIXEL;          //first pixel col to read
 
-static short input=0;            //which vision chip to read from
+static uint16_t input=0;            //which vision chip to read from
 
 // FPN calibration. To save memory we are placing the FPN calibration
 // array in an uint8_t, since the variation between pixels may be 
@@ -82,7 +82,7 @@ static short input=0;            //which vision chip to read from
 // applied to the entire FPN array. Thus the FPN mask for pixel i will be the 
 // value mask[i]+mask_base.
 static uint8_t mask[MAX_PIXELS]; // 16x16 FPN calibration image
-static short mask_base=0; // FPN calibration image base.
+static uint16_t mask_base=0; // FPN calibration image base.
 
 // Command inputs - for receiving commands from user via Serial terminal
 static char command; // command character

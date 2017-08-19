@@ -103,7 +103,7 @@ class Stonyman
          * Example 2: To use the amplifier and set the gain to 4:
          * setConfig(4,1,1);
          */
-        void setConfig(uint8_t gain, uint8_t selamp,uint8_t cvdda=1);
+        void setConfig(uint8_t gain, uint8_t selamp, uint8_t cvdda=1);
 
         /**
          *  A friendlier version of setConfig.  If amplifier gain is set to 
@@ -123,7 +123,7 @@ class Stonyman
          * @param hbin set to 1, 2, 4, or 8 to bin horizontally by that amount
          * @param vbin set to 1, 2, 4, or 8 to bin vertically by that amount
          */
-        void setBinning(uint8_t hbin,uint8_t vbin);
+        void setBinning(uint8_t hbin, uint8_t vbin);
 
         /**
          * Sets the VREF register value 
@@ -160,20 +160,20 @@ class Stonyman
         /**
          * Exposes the vision chip to uniform texture (such as a white piece
          * of paper placed over the optics).  Take an image using the 
-         * getImage function.  Pass the short "img" array and the "size"
+         * getImage function.  Pass the uint16_t "img" array and the "size"
          * number of pixels, along with a uint8_t "mask" array to hold
          * the FPN mask and mask_base for the FPN mask base.  Function will
          * populate the mask array and mask_base variable with the FPN mask,
          * which can then be used with the applMask function. 
          */
-        void calcMask(short *img, short size, uint8_t *mask, short *mask_base);
+        void calcMask(uint16_t *img, uint16_t size, uint8_t *mask, uint16_t *mask_base);
 
         /**
          * Given the "mask" and "mask_base" variables calculated in        
          * calcMask, and a current image, subtracts the
          * mask to provide a calibrated image.
          */
-        void applyMask(short *img, short size, uint8_t *mask, short mask_base);
+        void applyMask(uint16_t *img, uint16_t size, uint8_t *mask, uint16_t mask_base);
 
         /**
          * Acquires a box section of a Stonyman or Hawksbill 
@@ -182,7 +182,7 @@ class Stonyman
          * raster manner (e.g. row wise) and stored as such in a 1D array. 
          * In this case the pointer img points to the output array. 
          *
-         * @param img (output) pointer to image array, an array of signed shorts
+         * @param img (output) pointer to image array, an array of signed uint16_ts
          * @param rowstart first row to acquire
          * @param numrows number of rows to acquire
          * @param rowskip skipping between rows (useful if binning is used)
@@ -200,7 +200,7 @@ class Stonyman
          * Grab entire Stonyman chip when using 8x8 binning. Grab from input 2.
          */
         void getImageAnalog(
-                short *img, 
+                uint16_t *img, 
                 uint8_t rowstart, 
                 uint8_t numrows, 
                 uint8_t rowskip, 
@@ -210,7 +210,7 @@ class Stonyman
                 uint8_t input);
 
         void getImageDigital(
-                short *img, 
+                uint16_t *img, 
                 uint8_t rowstart, 
                 uint8_t numrows, 
                 uint8_t rowskip, 
@@ -227,7 +227,7 @@ class Stonyman
          * raster manner (e.g. row wise) and stored as such in a 1D array. 
          * In this case the pointer img points to the output array. 
          *
-         * @param img (output): pointer to image array, an array of signed shorts
+         * @param img (output): pointer to image array, an array of signed uint16_ts
          * @param rowstart: first row to acquire
          * @param numrows: number of rows to acquire
          * @param rowskip: skipping between rows (useful if binning is used)
@@ -245,7 +245,7 @@ class Stonyman
          * Grab entire Stonyman chip when using 8x8 binning. Grab from input 2.
          */
         void getImageRowSumAnalog(
-                short *img, 
+                uint16_t *img, 
                 uint8_t rowstart, 
                 uint8_t numrows, 
                 uint8_t rowskip, 
@@ -255,7 +255,7 @@ class Stonyman
                 uint8_t input);
 
         void getImageRowSumDigital(
-                short *img, 
+                uint16_t *img, 
                 uint8_t rowstart, 
                 uint8_t numrows, 
                 uint8_t rowskip, 
@@ -272,7 +272,7 @@ class Stonyman
          * raster manner (e.g. row wise) and stored as such in a 1D array. 
          * In this case the pointer img points to the output array. 
          *
-         * @param img (output) pointer to image array, an array of signed shorts
+         * @param img (output) pointer to image array, an array of signed uint16_ts
          * @param rowstart first row to acquire
          * @param numrows number of rows to acquire
          * @param rowskip skipping between rows (useful if binning is used)
@@ -290,7 +290,8 @@ class Stonyman
          * getImage(img,0,14,8,0,14,8,2): 
          * Grab entire Stonyman chip when using 8x8 binning. Grab from input 2.
          */
-        void getImageColSumAnalog(short *img, 
+        void getImageColSumAnalog(
+                uint16_t *img, 
                 uint8_t rowstart, 
                 uint8_t numrows, 
                 uint8_t rowskip, 
@@ -299,7 +300,8 @@ class Stonyman
                 uint8_t colskip, 
                 uint8_t input);
 
-        void getImageColSumDigital(short *img, 
+        void getImageColSumDigital(
+                uint16_t *img, 
                 uint8_t rowstart, 
                 uint8_t numrows, 
                 uint8_t rowskip, 
@@ -414,7 +416,7 @@ class Stonyman
         uint8_t _inphi;
 
         void get_image(
-                short *img, 
+                uint16_t *img, 
                 uint8_t rowstart, 
                 uint8_t numrows, 
                 uint8_t rowskip, 
@@ -425,7 +427,7 @@ class Stonyman
                 bool use_digital);
 
         void get_image_row_sum(
-                short *img, 
+                uint16_t *img, 
                 uint8_t rowstart, 
                 uint8_t numrows, 
                 uint8_t rowskip, 
@@ -436,7 +438,7 @@ class Stonyman
                 bool use_digital);
 
         void get_image_col_sum(
-                short *img, 
+                uint16_t *img, 
                 uint8_t rowstart, 
                 uint8_t numrows, 
                 uint8_t rowskip, 
@@ -479,11 +481,11 @@ class Stonyman
         void set_pointer(uint8_t ptr);
 
         // Sets value of current register
-        void set_value(short val);
+        void set_value(uint16_t val);
 
         //	Sets the pointer system register to the desired value.  Value is
         //	not reset so the current value must be taken into account.
-        void inc_value(short val);
+        void inc_value(uint16_t val);
 
         //	Operates the amplifier.  Sets inphi pin high, delays to allow
         //	value time to settle, and then brings it low.
@@ -494,7 +496,7 @@ class Stonyman
 
         //	Sets the pointer to a register and sets the value of that        
         //	register
-        void set_pointer_value(uint8_t ptr,short val);
+        void set_pointer_value(uint8_t ptr,uint16_t val);
 };
 
 #endif

@@ -33,36 +33,38 @@ policies, either expressed or implied, of Centeye, Inc.
 #ifndef ARDUEYE_OFO_H
 #define ARDUEYE_OFO_H
 
+#include <stdint.h>
+
 // Low Pass Filters an OF value with coefficient alpha
-void LPF(short *filtered_OF,short *new_OF,float alpha);
+void LPF(int16_t *filtered_OF, int16_t *new_OF, float alpha);
 
 // Optical Accumulation using thresholding
-short Accumulate(short *new_OF,short *acc_OF,short threshold);
+uint16_t Accumulate(int16_t *new_OF, int16_t *acc_OF, int16_t threshold);
 
 // A simplified version of Srinivasan's Image Interpolation
 // algorithm for a 1D image
-void IIA_1D(short *curr_img, short *last_img, char numpix, short scale, short *out);
-void IIA_1D(char *curr_img, char *last_img, char numpix, short scale, short *out);
+void IIA_1D(uint16_t *curr_img, uint16_t *last_img, uint8_t numpix, uint16_t scale, int16_t *out);
+void IIA_1D(uint8_t *curr_img, uint8_t *last_img, uint8_t numpix, uint16_t scale, int16_t *out);
 
 // A simplified version of Srinivasan's Image Interpolation
 // algorithm for a 2D image using the standard plus interpolation
-void IIA_Plus_2D(char *curr_img, char *last_img, short rows, short cols, short scale,short *ofx,short *ofy);
-void IIA_Plus_2D(short *curr_img, short *last_img, short rows,short cols, short scale,short *ofx,short *ofy);
+void IIA_Plus_2D(uint8_t *curr_img, uint8_t *last_img, uint16_t rows, uint16_t cols, uint16_t scale,int16_t * ofx,int16_t * ofy);
+void IIA_Plus_2D(uint16_t *curr_img, uint16_t *last_img, uint16_t rows,uint16_t cols, uint16_t scale,int16_t * ofx,int16_t * ofy);
 
 // A simplified version of Srinivasan's Image Interpolation 
 // algorithms for a 2D image using the more compact square 	
 // interpolation
-void IIA_Square_2D(char *curr_img, char *last_img, short rows, short cols, short scale,short *ofx,short *ofy);
-void IIA_Square_2D(short *curr_img, short *last_img, short rows, short cols, short scale,short *ofx,short *ofy);
+void IIA_Square_2D(uint8_t *curr_img, uint8_t *last_img, uint16_t rows, uint16_t cols, uint16_t scale,int16_t * ofx,int16_t * ofy);
+void IIA_Square_2D(uint16_t *curr_img, uint16_t *last_img, uint16_t rows, uint16_t cols, uint16_t scale,int16_t * ofx,int16_t * ofy);
 
 // Lucas Kanade algorithm for optical flow for a 2D image using
 // the standard plus interpolation
-void LK_Plus_2D(char *curr_img, char *last_img, short rows, short cols, short scale, short *ofx, short *ofy);
-void LK_Plus_2D(short *curr_img, short *last_img, short rows, short cols, short scale,short *ofx,short *ofy);
+void LK_Plus_2D(uint8_t *curr_img, uint8_t *last_img, uint16_t rows, uint16_t cols, uint16_t scale, int16_t * ofx, int16_t * ofy);
+void LK_Plus_2D(uint16_t *curr_img, uint16_t *last_img, uint16_t rows, uint16_t cols, uint16_t scale,int16_t * ofx,int16_t * ofy);
 
 // Lucas Kanade algorithm for optical flow for a 2D image
 // using the more compact square interpolation
-void LK_Square_2D(char *curr_img, char *last_img, short rows, short cols, short scale,short *ofx,short *ofy);
-void LK_Square_2D(short *curr_img, short *last_img, short rows, short cols, short scale,short *ofx,short *ofy);
+void LK_Square_2D(uint8_t *curr_img, uint8_t *last_img, uint16_t rows, uint16_t cols, uint16_t scale,int16_t * ofx,int16_t * ofy);
+void LK_Square_2D(uint16_t *curr_img, uint16_t *last_img, uint16_t rows, uint16_t cols, uint16_t scale,int16_t * ofx,int16_t * ofy);
 
 #endif

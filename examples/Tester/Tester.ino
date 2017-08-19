@@ -76,7 +76,7 @@
 
 // recall from note above that image arrays are stored row-size in a 1D array
 
-static short   img[MAX_PIXELS];         // 1D image array
+static uint16_t img[MAX_PIXELS];        // 1D image array
 
 static uint8_t row=MAX_ROWS;            // maximum rows allowed by memory
 static uint8_t col=MAX_COLS;            // maximum cols allowed by memory
@@ -93,7 +93,7 @@ static uint8_t input=0;                 // which vision chip to read from
 // applied to the entire FPN array. Thus the FPN mask for pixel i will be the 
 // value mask[i]+mask_base.
 static uint8_t mask[MAX_PIXELS]; // 16x16 FPN calibration image
-static short mask_base=0; // FPN calibration image base.
+static uint16_t mask_base=0; // FPN calibration image base.
 
 // Command inputs - for receiving commands from user via Serial terminal
 static char command; // command character
@@ -115,14 +115,14 @@ static GUIClient gui;
 
 // the fitsMemory function makes sure the image will fit
 // in Arduino's memory
-static bool fitsMemory(short r,short c)
+static bool fitsMemory(uint16_t r,uint16_t c)
 {
     return(((r*c)<=MAX_PIXELS));
 }
 
 // the fitsArray function makes sure the image will not
 // be larger than the Stonyman 112x112 array size
-static bool fitsArray(short r,short c,short str,short stc,short skr,short skc)
+static bool fitsArray(uint16_t r,uint16_t c,uint16_t str,uint16_t stc,uint16_t skr,uint16_t skc)
 {
     return( (((str+r*skr)<=112)&&((stc+c*skc)<=112)) );
 }
@@ -355,5 +355,4 @@ void loop()
     points[0]=(uint8_t)row_max;
     points[1]=(uint8_t)col_max;
     gui.sendPoints(row,col,points,1);
-
 }

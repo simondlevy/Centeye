@@ -40,7 +40,7 @@ policies, either expressed or implied, of Centeye, Inc.
 //	alpha should be between 0-1 
 /*********************************************************************/
 
-void LPF(short *filtered_OF,short *new_OF,float alpha)
+void LPF(int16_t *filtered_OF, int16_t *new_OF, float alpha)
 {
     (*filtered_OF)=(*filtered_OF)+((float)(*new_OF)-(*filtered_OF))	*alpha;
 }
@@ -50,9 +50,9 @@ void LPF(short *filtered_OF,short *new_OF,float alpha)
 //	The current optical flow value is added to the accumulation sum
 //	only if it crosses a threshold
 /*********************************************************************/      
-short Accumulate(short *new_OF,short *acc_OF, short threshold)
+uint16_t Accumulate(int16_t *new_OF, int16_t *acc_OF, uint16_t threshold)
 {
-    short reset=0;
+    uint16_t reset=0;
 
     if((*new_OF>threshold)||(*new_OF<-threshold))
     {
@@ -65,7 +65,7 @@ short Accumulate(short *new_OF,short *acc_OF, short threshold)
 
 
 /*********************************************************************/
-//	IIA_1D (short version)
+//	IIA_1D (uint16_t version)
 //	This is a one dimensional version of the image interpolation
 //	algorithm (IIA) as described by Prof. Mandyam Srinivasan. 
 //	curr_img and last_img are input line images. numpix is the number 
@@ -80,11 +80,11 @@ short Accumulate(short *new_OF,short *acc_OF, short threshold)
 //	out: pointer to integer value for output.
 /*********************************************************************/
 
-void IIA_1D(short *curr_img, short *last_img, char numpix, short scale, short *out) 
+void IIA_1D(uint16_t *curr_img, uint16_t *last_img, uint8_t numpix, uint16_t scale, uint16_t *out) 
 {
-    short *pleft,*pright,*pone,*ptwo;
+    uint16_t *pleft,*pright,*pone,*ptwo;
     long top,bottom;
-    char i;
+    uint8_t i;
     int deltat,deltax;
 
     // Set up pointers
@@ -117,7 +117,7 @@ void IIA_1D(short *curr_img, short *last_img, char numpix, short scale, short *o
 }
 
 /*********************************************************************/
-//	IIA_1D (char version)
+//	IIA_1D (uint8_t version)
 //	This is a one dimensional version of the image interpolation
 //	algorithm (IIA) as described by Prof. Mandyam Srinivasan. 
 //	curr_img and last_img are input line images. numpix is the 
@@ -132,12 +132,12 @@ void IIA_1D(short *curr_img, short *last_img, char numpix, short scale, short *o
 //	out: pointer to integer value for output.
 /*********************************************************************/
 
-void IIA_1D(char *curr_img, char *last_img, char 	numpix, short scale, short *out) 
+void IIA_1D(uint8_t *curr_img, uint8_t *last_img, uint8_t 	numpix, uint16_t scale, uint16_t *out) 
 {
-    char *pleft,*pright,*pone,*ptwo;
+    uint8_t *pleft,*pright,*pone,*ptwo;
     long top,bottom;
     int deltat,deltax;
-    char i;
+    uint8_t i;
 
     // Set up pointers
     pleft = curr_img;	//left-shifted image
@@ -169,7 +169,7 @@ void IIA_1D(char *curr_img, char *last_img, char 	numpix, short scale, short *ou
 
 
 /*********************************************************************/
-//	IIA_Plus_2D (char version)
+//	IIA_Plus_2D (uint8_t version)
 //	This function computes optical flow between two images curr_img //	and last_img using a simplified version of Mandyam Srinivasan's //	image interpolation algorithm. This algorithm assumes that 
 //	displacements are generally on the order of one pixel or less. 
 //
@@ -186,24 +186,24 @@ void IIA_1D(char *curr_img, char *last_img, char 	numpix, short scale, short *ou
 //	ofy: pointer to integer value for Y shift.
 /*********************************************************************/
 
-void IIA_Plus_2D(char *curr_img, char *last_img, short rows,short cols, short scale, short *ofx, short *ofy)
+void IIA_Plus_2D(uint8_t *curr_img, uint8_t *last_img, uint16_t rows,uint16_t cols, uint16_t scale, int16_t * ofx, int16_t * ofy)
 {
     int32_t  A=0, BD=0, C=0, E=0, F=0;
     int16_t  F2F1, F4F3, FCF0;
 
     // set up pointers
-    char *f0 = curr_img + cols + 1; //center image
-    char *f1 = curr_img + cols + 2; //right-shifted image
-    char *f2 = curr_img + cols;     //left-shifted image	
-    char *f3 = curr_img + 2*cols + 1; //down-shifted image	
-    char *f4 = curr_img + 1;		//up-shifted image
-    char *fz = last_img + cols + 1; 	//time-shifted image
+    uint8_t *f0 = curr_img + cols + 1; //center image
+    uint8_t *f1 = curr_img + cols + 2; //right-shifted image
+    uint8_t *f2 = curr_img + cols;     //left-shifted image	
+    uint8_t *f3 = curr_img + 2*cols + 1; //down-shifted image	
+    uint8_t *f4 = curr_img + 1;		//up-shifted image
+    uint8_t *fz = last_img + cols + 1; 	//time-shifted image
 
 
     // loop through
-    for (char r=1; r<rows-1; ++r) 
+    for (uint8_t r=1; r<rows-1; ++r) 
     { 
-        for (char c=1; c<cols-1; ++c) 
+        for (uint8_t c=1; c<cols-1; ++c) 
         { 
             // compute differentials, then increment pointers 
             F2F1 = (*(f2++) - *(f1++));
@@ -236,13 +236,13 @@ void IIA_Plus_2D(char *curr_img, char *last_img, short rows,short cols, short sc
     int64_t XS = (2*scale*top1)/bottom;
     int64_t YS = (2*scale*top2)/bottom;
 
-    (*ofx) = (short)XS;
-    (*ofy) = (short)YS;
+    (*ofx) = (int16_t)XS;
+    (*ofy) = (int16_t)YS;
 }
 
 
 /*********************************************************************/
-//	IIA_Plus_2D (short version)
+//	IIA_Plus_2D (uint16_t version)
 //	This function computes optical flow between two images curr_img 
 //	and last_img using a simplified version of Mandyam Srinivasan's 
 //	image interpolation algorithm. This algorithm assumes that 
@@ -261,24 +261,24 @@ void IIA_Plus_2D(char *curr_img, char *last_img, short rows,short cols, short sc
 //	ofy: pointer to integer value for Y shift.
 /*********************************************************************/
 
-void IIA_Plus_2D(short *curr_img, short *last_img, short rows,short cols, short scale, short *ofx, short *ofy)
+void IIA_Plus_2D(uint16_t *curr_img, uint16_t *last_img, uint16_t rows,uint16_t cols, uint16_t scale, int16_t * ofx, int16_t * ofy)
 {
     int32_t  A=0, BD=0, C=0, E=0, F=0;
     int16_t  F2F1, F4F3, FCF0;
 
     // set up pointers
-    short *f0 = curr_img + cols + 1; //center image
-    short *f1 = curr_img + cols + 2; //right-shifted image
-    short *f2 = curr_img + cols;     //left-shifted image	
-    short *f3 = curr_img + 2*cols + 1; //down-shifted image	
-    short *f4 = curr_img + 1;		//up-shifted image
-    short *fz = last_img + cols + 1; 	//time-shifted image
+    uint16_t *f0 = curr_img + cols + 1; //center image
+    uint16_t *f1 = curr_img + cols + 2; //right-shifted image
+    uint16_t *f2 = curr_img + cols;     //left-shifted image	
+    uint16_t *f3 = curr_img + 2*cols + 1; //down-shifted image	
+    uint16_t *f4 = curr_img + 1;		//up-shifted image
+    uint16_t *fz = last_img + cols + 1; 	//time-shifted image
 
 
     // loop through
-    for (char r=1; r<rows-1; ++r) 
+    for (uint8_t r=1; r<rows-1; ++r) 
     { 
-        for (char c=1; c<cols-1; ++c) 
+        for (uint8_t c=1; c<cols-1; ++c) 
         { 
             // compute differentials, then increment pointers 
             F2F1 = (*(f2++) - *(f1++));
@@ -311,12 +311,12 @@ void IIA_Plus_2D(short *curr_img, short *last_img, short rows,short cols, short 
     int64_t XS = (2*scale*top1)/bottom;
     int64_t YS = (2*scale*top2)/bottom;
 
-    (*ofx) = (short)XS;
-    (*ofy) = (short)YS;
+    (*ofx) = (int16_t)XS;
+    (*ofy) = (int16_t)YS;
 }
 
 /*********************************************************************/
-//	IIA_Square_2D (char version)
+//	IIA_Square_2D (uint8_t version)
 //	This function computes optical flow between two images curr_img //	and last_img using a simplified version of Mandyam Srinivasan's //	image interpolation algorithm. This algorithm assumes that 
 //	displacements are generally on the order of one pixel or less. 
 //	Instead of the traditional 'plus'
@@ -333,22 +333,22 @@ void IIA_Plus_2D(short *curr_img, short *last_img, short rows,short cols, short 
 //	ofy: pointer to integer value for Y shift.
 /*********************************************************************/
 
-void IIA_Square_2D(char *curr_img, char *last_img, short rows,short cols, short scale, short *ofx, short *ofy)
+void IIA_Square_2D(uint8_t *curr_img, uint8_t *last_img, uint16_t rows,uint16_t cols, uint16_t scale, int16_t * ofx, int16_t * ofy)
 {
     int32_t  A=0, BD=0, C=0, E=0, F=0;
     int16_t  F2F1, F4F3, FCF0;
 
     // set up pointers
-    char *f0 = curr_img;//top left 
-    char *f1 = curr_img + 1; 		//top right
-    char *f2 = curr_img + cols; 	//bottom left
-    char *f3 = curr_img + cols + 1; 	//bottom right
-    char *fz = last_img; 		//top left time-shifted
+    uint8_t *f0 = curr_img;//top left 
+    uint8_t *f1 = curr_img + 1; 		//top right
+    uint8_t *f2 = curr_img + cols; 	//bottom left
+    uint8_t *f3 = curr_img + cols + 1; 	//bottom right
+    uint8_t *fz = last_img; 		//top left time-shifted
 
     // loop through
-    for (char r=0; r<rows-1; ++r) 
+    for (uint8_t r=0; r<rows-1; ++r) 
     { 
-        for (char c=0; c<cols-1; ++c) 
+        for (uint8_t c=0; c<cols-1; ++c) 
         { 
             // compute differentials
             F2F1 = ((*(f0) - *(f1)) + (*(f2) - *(f3))) ;
@@ -388,12 +388,12 @@ void IIA_Square_2D(char *curr_img, char *last_img, short rows,short cols, short 
     int64_t XS = (2*scale*top1)/bottom;
     int64_t YS = (2*scale*top2)/bottom;
 
-    (*ofx) = (short)XS;
-    (*ofy) = (short)YS;
+    (*ofx) = (int16_t)XS;
+    (*ofy) = (int16_t)YS;
 }
 
 /*********************************************************************/
-//	IIA_Square_2D (short version)
+//	IIA_Square_2D (uint16_t version)
 //	This function computes optical flow between two images curr_img 
 //	and last_img using a simplified version of Mandyam Srinivasan's 
 //	image interpolation algorithm. This algorithm assumes that 
@@ -412,22 +412,22 @@ void IIA_Square_2D(char *curr_img, char *last_img, short rows,short cols, short 
 //	ofy: pointer to integer value for Y shift.
 /*********************************************************************/
 
-void IIA_Square_2D(short *curr_img,short *last_img, short rows,short cols, short scale, short *ofx, short *ofy)
+void IIA_Square_2D(uint16_t *curr_img,uint16_t *last_img, uint16_t rows,uint16_t cols, uint16_t scale, int16_t * ofx, int16_t * ofy)
 {
     int32_t  A=0, BD=0, C=0, E=0, F=0;
     int16_t  F2F1, F4F3, FCF0;
 
     // set up pointers
-    short *f0 = curr_img;//top left 
-    short *f1 = curr_img + 1; 		//top right
-    short *f2 = curr_img + cols; 	//bottom left
-    short *f3 = curr_img + cols + 1; 	//bottom right
-    short *fz = last_img; 		//top left time-shifted
+    uint16_t *f0 = curr_img;//top left 
+    uint16_t *f1 = curr_img + 1; 		//top right
+    uint16_t *f2 = curr_img + cols; 	//bottom left
+    uint16_t *f3 = curr_img + cols + 1; 	//bottom right
+    uint16_t *fz = last_img; 		//top left time-shifted
 
     // loop through
-    for (char r=0; r<rows-1; ++r) 
+    for (uint8_t r=0; r<rows-1; ++r) 
     { 
-        for (char c=0; c<cols-1; ++c) 
+        for (uint8_t c=0; c<cols-1; ++c) 
         { 
             // compute differentials
             F2F1 = ((*(f0) - *(f1)) + (*(f2) - *(f3))) ;
@@ -467,12 +467,12 @@ void IIA_Square_2D(short *curr_img,short *last_img, short rows,short cols, short
     int64_t XS = (2*scale*top1)/bottom;
     int64_t YS = (2*scale*top2)/bottom;
 
-    (*ofx) = (short)XS;
-    (*ofy) = (short)YS;
+    (*ofx) = (int16_t)XS;
+    (*ofy) = (int16_t)YS;
 }
 
 /*********************************************************************/
-//	LK_Plus_2D (char version)
+//	LK_Plus_2D (uint8_t version)
 //	This function computes optical flow between two images curr_img 
 //	and last_img using a version of Lucas-Kanade's algorithm
 //	This algorithm assumes that displacements are generally on 
@@ -488,22 +488,22 @@ void IIA_Square_2D(short *curr_img,short *last_img, short rows,short cols, short
 //	ofy: pointer to integer value for Y shift.
 /*********************************************************************/
 
-void LK_Plus_2D(char *curr_img, char *last_img, short rows,short cols, short scale, short *ofx, short *ofy)
+void LK_Plus_2D(uint8_t *curr_img, uint8_t *last_img, uint16_t rows,uint16_t cols, uint16_t scale, int16_t * ofx, int16_t * ofy)
 {
     int32_t  A11=0, A12=0, A22=0, b1=0, b2=0;
     int16_t  F2F1, F4F3, FCF0;
 
     // set up pointers
-    char *f0 = curr_img + cols + 1; //center image
-    char *f1 = curr_img + cols + 2; //right-shifted image
-    char *f2 = curr_img + cols;     //left-shifted image	
-    char *f3 = curr_img + 2*cols + 1; //down-shifted image	
-    char *f4 = curr_img + 1;		//up-shifted image
-    char *fz = last_img + cols + 1; 	//time-shifted image
+    uint8_t *f0 = curr_img + cols + 1; //center image
+    uint8_t *f1 = curr_img + cols + 2; //right-shifted image
+    uint8_t *f2 = curr_img + cols;     //left-shifted image	
+    uint8_t *f3 = curr_img + 2*cols + 1; //down-shifted image	
+    uint8_t *f4 = curr_img + 1;		//up-shifted image
+    uint8_t *fz = last_img + cols + 1; 	//time-shifted image
 
     // loop through
-    for (char r=1; r<rows-1; ++r) { 
-        for (char c=1; c<cols-1; ++c) { 
+    for (uint8_t r=1; r<rows-1; ++r) { 
+        for (uint8_t c=1; c<cols-1; ++c) { 
             // compute differentials, then increment pointers (post 		// increment)
             F2F1 = (*(f2++) - *(f1++));	//horizontal differential
             F4F3 = (*(f4++) - *(f3++));	//vertical differential
@@ -533,12 +533,12 @@ void LK_Plus_2D(char *curr_img, char *last_img, short rows,short cols, short sca
     int64_t XS = ( (int64_t)(b1)*A22 - (int64_t)(b2)*A12 ) * scale / 		detA;
     int64_t YS = ( (int64_t)(b2)*A11 - (int64_t)(b1)*A12 ) * scale / 		detA;
 
-    (*ofx) = (short)XS;
-    (*ofy) = (short)YS;
+    (*ofx) = (int16_t)XS;
+    (*ofy) = (int16_t)YS;
 }
 
 /*********************************************************************/
-//	LK_Plus_2D (short version)
+//	LK_Plus_2D (uint16_t version)
 //	This function computes optical flow between two images curr_img 
 //	and last_img using a version of Lucas-Kanade's algorithm
 //	This algorithm assumes that displacements are generally on 
@@ -554,22 +554,22 @@ void LK_Plus_2D(char *curr_img, char *last_img, short rows,short cols, short sca
 //	ofy: pointer to integer value for Y shift.
 /*********************************************************************/
 
-void LK_Plus_2D(short *curr_img, short *last_img, short rows,short cols, short scale, short *ofx, short *ofy)
+void LK_Plus_2D(uint16_t *curr_img, uint16_t *last_img, uint16_t rows,uint16_t cols, uint16_t scale, int16_t * ofx, int16_t * ofy)
 {
     int32_t  A11=0, A12=0, A22=0, b1=0, b2=0;
     int16_t  F2F1, F4F3, FCF0;
 
     // set up pointers
-    short *f0 = curr_img + cols + 1; //center image
-    short *f1 = curr_img + cols + 2; //right-shifted image
-    short *f2 = curr_img + cols;     //left-shifted image	
-    short *f3 = curr_img + 2*cols + 1; //down-shifted image	
-    short *f4 = curr_img + 1;		//up-shifted image
-    short *fz = last_img + cols + 1; 	//time-shifted image
+    uint16_t *f0 = curr_img + cols + 1; //center image
+    uint16_t *f1 = curr_img + cols + 2; //right-shifted image
+    uint16_t *f2 = curr_img + cols;     //left-shifted image	
+    uint16_t *f3 = curr_img + 2*cols + 1; //down-shifted image	
+    uint16_t *f4 = curr_img + 1;		//up-shifted image
+    uint16_t *fz = last_img + cols + 1; 	//time-shifted image
 
     // loop through
-    for (char r=1; r<rows-1; ++r) { 
-        for (char c=1; c<cols-1; ++c) { 
+    for (uint8_t r=1; r<rows-1; ++r) { 
+        for (uint8_t c=1; c<cols-1; ++c) { 
             // compute differentials, then increment pointers (post 		// increment)
             F2F1 = (*(f2++) - *(f1++));	//horizontal differential
             F4F3 = (*(f4++) - *(f3++));	//vertical differential
@@ -599,12 +599,12 @@ void LK_Plus_2D(short *curr_img, short *last_img, short rows,short cols, short s
     int64_t XS = ( (int64_t)(b1)*A22 - (int64_t)(b2)*A12 ) * scale / detA;
     int64_t YS = ( (int64_t)(b2)*A11 - (int64_t)(b1)*A12 ) * scale / detA;
 
-    (*ofx) = (short)XS;
-    (*ofy) = (short)YS;
+    (*ofx) = (int16_t)XS;
+    (*ofy) = (int16_t)YS;
 }
 
 /*********************************************************************/
-//	LK_Square_2D (char version)
+//	LK_Square_2D (uint8_t version)
 //	This function computes optical flow between two images curr_img 
 //	and last_img using a version of Lucas-Kanade's algorithm
 //	This algorithm assumes that displacements are generally on 
@@ -622,22 +622,22 @@ void LK_Plus_2D(short *curr_img, short *last_img, short rows,short cols, short s
 //	ofy: pointer to integer value for Y shift.
 /*********************************************************************/
 
-void LK_Square_2D(char *curr_img, char *last_img, short rows,short cols, short scale, short *ofx, short *ofy)
+void LK_Square_2D(uint8_t *curr_img, uint8_t *last_img, uint16_t rows,uint16_t cols, uint16_t scale, int16_t * ofx, int16_t * ofy)
 {
     int32_t  A11=0, A12=0, A22=0, b1=0, b2=0;
     int16_t  F2F1, F4F3, FCF0;
 
     // set up pointers
-    char *f0 = curr_img;//top left 
-    char *f1 = curr_img + 1; 		//top right
-    char *f2 = curr_img + cols; 	//bottom left
-    char *f3 = curr_img + cols + 1; 	//bottom right
-    char *fz = last_img; 		//top left time-shifted
+    uint8_t *f0 = curr_img;//top left 
+    uint8_t *f1 = curr_img + 1; 		//top right
+    uint8_t *f2 = curr_img + cols; 	//bottom left
+    uint8_t *f3 = curr_img + cols + 1; 	//bottom right
+    uint8_t *fz = last_img; 		//top left time-shifted
 
     // loop through
-    for (char r=0; r<rows-1; ++r) 
+    for (uint8_t r=0; r<rows-1; ++r) 
     { 
-        for (char c=0; c<cols-1; ++c) 
+        for (uint8_t c=0; c<cols-1; ++c) 
         { 
             // compute differentials      
             F2F1 = ((*(f0) - *(f1)) + (*(f2) - *(f3))) ;
@@ -676,12 +676,12 @@ void LK_Square_2D(char *curr_img, char *last_img, short rows,short cols, short s
     int64_t XS = ( (int64_t)(b1)*A22 - (int64_t)(b2)*A12 ) * scale / detA;
     int64_t YS = ( (int64_t)(b2)*A11 - (int64_t)(b1)*A12 ) * scale / detA;
 
-    (*ofx) = (short)XS;
-    (*ofy) = (short)YS;
+    (*ofx) = (int16_t)XS;
+    (*ofy) = (int16_t)YS;
 }
 
 /*********************************************************************/
-//	LK_Square_2D (short version)
+//	LK_Square_2D (uint16_t version)
 //	This function computes optical flow between two images curr_img 
 //	and last_img using a version of Lucas-Kanade's algorithm
 //	This algorithm assumes that displacements are generally on 
@@ -699,23 +699,23 @@ void LK_Square_2D(char *curr_img, char *last_img, short rows,short cols, short s
 //	ofy: pointer to integer value for Y shift.
 /*********************************************************************/
 
-void LK_Square_2D(short *curr_img, short *last_img, short rows, short cols, short scale, short *ofx, short *ofy)
+void LK_Square_2D(uint16_t *curr_img, uint16_t *last_img, uint16_t rows, uint16_t cols, uint16_t scale, int16_t * ofx, int16_t * ofy)
 {
     int32_t  A11=0, A12=0, A22=0, b1=0, b2=0;
     int16_t  F2F1, F4F3, FCF0;
 
     // set up pointers
-    short *f0 = curr_img;//top left 
-    short *f1 = curr_img + 1; 		//top right
-    short *f2 = curr_img + cols; 	//bottom left
-    short *f3 = curr_img + cols + 1; 	//bottom right
-    short *fz = last_img; 		//top left time-shifted
+    uint16_t *f0 = curr_img;//top left 
+    uint16_t *f1 = curr_img + 1; 		//top right
+    uint16_t *f2 = curr_img + cols; 	//bottom left
+    uint16_t *f3 = curr_img + cols + 1; 	//bottom right
+    uint16_t *fz = last_img; 		//top left time-shifted
 
 
     // loop through
-    for (char r=0; r<rows-1; ++r) 
+    for (uint8_t r=0; r<rows-1; ++r) 
     { 
-        for (char c=0; c<cols-1; ++c) 
+        for (uint8_t c=0; c<cols-1; ++c) 
         { 
             // compute differentials
             F2F1 = (*(f0) - *(f1)) + (*(f2) - *(f3))  ;
@@ -754,6 +754,6 @@ void LK_Square_2D(short *curr_img, short *last_img, short rows, short cols, shor
     int64_t XS = ( (int64_t)(b1)*A22 - (int64_t)(b2)*A12 ) * scale / detA;
     int64_t YS = ( (int64_t)(b2)*A11 - (int64_t)(b1)*A12 ) * scale / detA;
 
-    (*ofx) = (short)XS;
-    (*ofy) = (short)YS;
+    (*ofx) = (int16_t)XS;
+    (*ofy) = (int16_t)YS;
 }
