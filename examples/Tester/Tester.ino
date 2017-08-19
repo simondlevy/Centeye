@@ -60,7 +60,7 @@
 // be included in the Arduino "libraries" folder.
 
 #include <Stonyman.h>  //Stonyman/Hawksbill vision chip library
-#include <GUI.h>       //ArduEye processing GUI interface
+#include <GUIClient.h>       //ArduEye processing GUI interface
 
 #include <SPI.h>  //SPI library is needed to use an external ADC
 //not supported for MEGA 2560
@@ -107,6 +107,8 @@ static uint8_t points[2];  //points array to send down to the GUI
 //object representing our sensor
 static Stonyman stonyman(RESP, INCP, RESV, INCV);
 
+//for communicating with GUI
+static GUIClient gui;
 
 //=======================================================================
 // FUNCTIONS DEFINED FOR THIS SKETCH
@@ -138,7 +140,7 @@ static void processCommands()
         // get user command and argument
         // this function also checks for the presence of the GUI
         // so you must use this function if you are using the GUI 
-        ArduEyeGUI.getCommand(&command,&commandArgument); 
+        gui.getCommand(&command,&commandArgument); 
 
         //switch statement to process commands
         switch (command) {
@@ -347,11 +349,11 @@ void loop()
     stonyman.applyMask(img,row*col,mask,mask_base);
 
     //if GUI is enabled then send image for display
-    ArduEyeGUI.sendImage(row,col,img,row*col);
+    gui.sendImage(row,col,img,row*col);
 
     //if GUI is enabled then send max point for display
     points[0]=(uint8_t)row_max;
     points[1]=(uint8_t)col_max;
-    ArduEyeGUI.sendPoints(row,col,points,1);
+    gui.sendPoints(row,col,points,1);
 
 }

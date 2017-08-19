@@ -12,7 +12,7 @@ Requires: OpenCV
 #include <stdio.h>
 #include <string.h>
 
-#include <CenteyeOpticalFlow.h>
+#include <OpticalFlow.h>
 
 static const uint8_t  SCALEDOWN = 8;
 

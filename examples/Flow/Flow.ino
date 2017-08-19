@@ -56,9 +56,9 @@
 // be included in the Arduino "libraries" folder.
 
 #include <Stonyman.h>    // Stonymanl vision chip library
-#include <GUI.h>         // ArduEye processing GUI interface
+#include <GUIClient.h>   // ArduEye processing GUI interface
 #include <OpticalFlow.h> // Optical Flow support
-#include <Images.h>      // Some image support functions
+#include <ImageUtils.h>  // Some image support functions
 
 
 #include <SPI.h>  //SPI library is needed to use an external ADC
@@ -98,16 +98,19 @@ static char command; // command character
 static int commandArgument; // argument of command
 
 //a set of vectors to send down
-static char vectors[2];
+static int8_t vectors[2];
 
-static char OFType=0;
+static uint8_t OFType;
 
 //optical flow X and Y
-static short filtered_OFX=0,filtered_OFY=0;
-static short OFX=0,OFY=0;
+static short filtered_OFX,filtered_OFY;
+static short OFX,OFY;
 
 //object representing our sensor
 static Stonyman stonyman(RESP, INCP, RESV, INCV);
+
+//object for communicating with GUI
+static GUIClient gui;
 
 //=======================================================================
 // FUNCTIONS DEFINED FOR THIS SKETCH
@@ -125,7 +128,7 @@ static void processCommands()
         // get user command and argument
         // this function also checks for the presence of the GUI
         // so you must use this function if you are using the GUI 
-        ArduEyeGUI.getCommand(&command,&commandArgument); 
+        gui.getCommand(&command,&commandArgument); 
 
         //switch statement to process commands
         switch (command) 
@@ -214,7 +217,7 @@ void loop()
     stonyman.applyMask(current_img,row*col,mask,mask_base);
 
     //if GUI is enabled then send image for display
-    ArduEyeGUI.sendImage(row,col,current_img,row*col);
+    gui.sendImage(row,col,current_img,row*col);
 
     //calculate optical flow
 
@@ -242,11 +245,11 @@ void loop()
     vectors[1]=filtered_OFY;     //vector1 y
 
     //send shifts to be displayed on GUI
-    ArduEyeGUI.sendVectors(1,1,vectors,1);
+    gui.sendVectors(1,1,vectors,1);
 
     //copy current_img to last_img so two frames are kept
     //for optical flow calculation
-    CYE_ImgShortCopy(current_img,last_img,row*col);
+    ImgShortCopy(current_img,last_img,row*col);
 
     //small delay
     delay(5);

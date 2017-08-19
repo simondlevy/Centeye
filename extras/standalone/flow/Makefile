@@ -8,14 +8,14 @@ SRC = ../../../src
 
 all: flowcap
 
-flowcap: flowcap.o CenteyeOpticalFlow.o
-	g++  -g -o flowcap  flowcap.o CenteyeOpticalFlow.o `pkg-config opencv --libs`
+flowcap: flowcap.o OpticalFlow.o
+	g++  -g -o flowcap  flowcap.o OpticalFlow.o `pkg-config opencv --libs`
 
-flowcap.o: flowcap.cpp $(SRC)/CenteyeOpticalFlow.h Makefile
+flowcap.o: flowcap.cpp $(SRC)/OpticalFlow.h Makefile
 	g++  -Wall -I$(SRC) -c flowcap.cpp  `pkg-config opencv --cflags`
 
-CenteyeOpticalFlow.o: $(SRC)/CenteyeOpticalFlow.cpp $(SRC)/CenteyeOpticalFlow.h Makefile
-	g++ -Wall -I$(SRC) -c $(SRC)/CenteyeOpticalFlow.cpp
+OpticalFlow.o: $(SRC)/OpticalFlow.cpp $(SRC)/OpticalFlow.h Makefile
+	g++ -Wall -I$(SRC) -c $(SRC)/OpticalFlow.cpp
 
 clean:
 	rm -rf flowcap *.o *~ 

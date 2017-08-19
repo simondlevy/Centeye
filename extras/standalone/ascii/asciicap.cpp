@@ -1,5 +1,5 @@
 /*
-ascicap.cpp illustrates CYE_Images_v1 library by displaying a live ASCII image from your webcam.
+ascicap.cpp illustrates Images_v1 library by displaying a live ASCII image from your webcam.
 
 Copyright (C) 2017 Simon D. Levy
 
@@ -7,7 +7,7 @@ Requires: OpenCV
 */
 
 #include <opencv2/opencv.hpp>
-#include <CenteyeImages.h>
+#include <ImageUtils.h>
 
 static const int W = 80;
 static const int H = 60;
@@ -49,7 +49,7 @@ int main(int argc, char** argv)
         }
 
         // Dump image as ASCII
-        CYE_ImgShortDumpAsciiSerial(shortimage, H, W, 0, 255);
+        ImgShortDumpAsciiSerial(shortimage, H, W, 0, 255);
     }
 
     // The camera will be deinitialized automatically in VideoCapture destructor

@@ -1,5 +1,5 @@
 /*
-   GUI.h Library to interface with the Centeye Processing GUI
+   GUIClient.h Library to interface with the Centeye Processing GUI
 
    Functions to send data to the ArduEye processing GUI for display
    For example, send an image array to the GUI and have it display
@@ -61,14 +61,10 @@
 #define VECTORS_SHORT	10	//short vectors packet
 
 /*********************************************************************/
-/*********************************************************************/
-/*********************************************************************/
-/*********************************************************************/
-//	ArduEyeGUIClass
-/*********************************************************************/
+//	GUIClient
 /*********************************************************************/
 
-class ArduEyeGUIClass
+class GUIClient
 {
     // user-accessible "public" interface
     public:
@@ -76,7 +72,7 @@ class ArduEyeGUIClass
         // constructor has detected variable turned off
         // GUI functions must be enabled by command sent from
         // GUI on start-up.
-        ArduEyeGUIClass(void);		//constructor
+        GUIClient(void);		//constructor
 
         // enables all functions, called in response to special
         // command from GUI
@@ -111,7 +107,7 @@ class ArduEyeGUIClass
         // columns in the VECTOR display (not image).  Third argument
         // is an array of char or short pairs, each one a vector (X,Y)   
         // to be displayed, and final argument is number of vectors.	
-        void sendVectors(byte,byte,char*,short);
+        void sendVectors(byte,byte,int8_t*,short);
         void sendVectors(byte,byte,short*,short);
 
         // sends an array of points to be highlighted on the image in
@@ -128,8 +124,5 @@ class ArduEyeGUIClass
 
 
 };
-
-//class instance
-extern ArduEyeGUIClass ArduEyeGUI;
 
 #endif

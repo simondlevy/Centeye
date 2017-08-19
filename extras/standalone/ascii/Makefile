@@ -8,14 +8,14 @@ SRC = ../../../src
 
 all: asciicap
 
-asciicap: asciicap.o CenteyeImages.o
-	g++  -g -o asciicap  asciicap.o CenteyeImages.o `pkg-config opencv --libs`
+asciicap: asciicap.o ImageUtils.o
+	g++  -g -o asciicap  asciicap.o ImageUtils.o `pkg-config opencv --libs`
 
-asciicap.o: asciicap.cpp $(SRC)/CenteyeImages.h Makefile
+asciicap.o: asciicap.cpp $(SRC)/ImageUtils.h Makefile
 	g++  -Wall -I$(SRC) -c asciicap.cpp  `pkg-config opencv --cflags`
 
-CenteyeImages.o: $(SRC)/CenteyeImages.cpp $(SRC)/CenteyeImages.h Makefile
-	g++  -Wall -c $(SRC)/CenteyeImages.cpp
+ImageUtils.o: $(SRC)/ImageUtils.cpp $(SRC)/ImageUtils.h Makefile
+	g++  -Wall -c $(SRC)/ImageUtils.cpp
 
 clean:
 	rm -rf asciicap *.o *~ 

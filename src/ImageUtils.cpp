@@ -1,5 +1,5 @@
 /*
-   Images.cpp Basic functions to handle images
+   ImageUtils.cpp Basic functions to handle images
 
    Copyright (c) 2012 Centeye, Inc. 
    All rights reserved.
@@ -72,7 +72,7 @@
 #define RANDOM(m)     (random() % m)
 #endif
 
-#include "Images.h"
+#include "ImageUtils.h"
 
 //========================================================================
 // IMAGE BASICS AND MANIPULATION
@@ -81,19 +81,19 @@
 
 // These two variables define an array of characters used for ASCII
 // dumps of images to the Arduino serial monitor
-char CYE_ASCII_DISP_CHARS[16] = "#@$%&x*=o+-~,. ";
-char CYE_NUM_ASCII_DISP_CHARS = 15;
+char ASCII_DISP_CHARS[16] = "#@$%&x*=o+-~,. ";
+char NUM_ASCII_DISP_CHARS = 15;
 
 
 /*------------------------------------------------------------------------
-  CYE_ImgShortCopy -- Copies image A to image B.
+  ImgShortCopy -- Copies image A to image B.
 VARIABLES:
 A: copy from image
 B: copy to image
 numpix: number of pixels e.g. rows * columns
 STATUS: UNTESTED
  */
-void CYE_ImgShortCopy(short *A, short *B, unsigned short numpix) {
+void ImgShortCopy(short *A, short *B, unsigned short numpix) {
     unsigned short pix;
     short *pa,*pb;
     pa=A; pb=B;
@@ -104,14 +104,14 @@ void CYE_ImgShortCopy(short *A, short *B, unsigned short numpix) {
 }
 
 /*------------------------------------------------------------------------
-  CYE_ImgShortCopy -- Copies image A to image B. OVERLOADED for CHAR
+  ImgShortCopy -- Copies image A to image B. OVERLOADED for CHAR
 VARIABLES:
 A: copy from image
 B: copy to image
 numpix: number of pixels e.g. rows * columns
 STATUS: UNTESTED
  */
-void CYE_ImgShortCopy(char *A, char *B, unsigned short numpix) {
+void ImgShortCopy(char *A, char *B, unsigned short numpix) {
     unsigned short pix;
     char *pa,*pb;
     pa=A; pb=B;
@@ -128,7 +128,7 @@ void CYE_ImgShortCopy(char *A, char *B, unsigned short numpix) {
 //========================================================================
 
 /*------------------------------------------------------------------------
-  CYE_ImgShortDumpAsciiSerial -- Dumps image to the screen in a crude
+  ImgShortDumpAsciiSerial -- Dumps image to the screen in a crude
   ASCII format, with darker characters corresponding to brighter images
 VARIABLES:
 img: input image
@@ -139,7 +139,7 @@ maxi: predefined maximum- pixel values greater than this are
 considered white. Enter 0 to force the function to use the maximum value
 STATUS: UNTESTED
  */
-void CYE_ImgShortDumpAsciiSerial(short *img, short numrows, short numcolumns, short mini, short maxi) {
+void ImgShortDumpAsciiSerial(short *img, short numrows, short numcolumns, short mini, short maxi) {
     short i,m,n,*pix,delta;
 
     // if mini==0 then we compute minimum
@@ -160,7 +160,7 @@ void CYE_ImgShortDumpAsciiSerial(short *img, short numrows, short numcolumns, sh
     }
     // Compute delta value for display
     delta = maxi-mini;
-    delta = delta / CYE_NUM_ASCII_DISP_CHARS;
+    delta = delta / NUM_ASCII_DISP_CHARS;
     if (delta<1)
         delta=1;
 
@@ -173,11 +173,11 @@ void CYE_ImgShortDumpAsciiSerial(short *img, short numrows, short numcolumns, sh
             i = i / delta;
             if (i<0)
                 i=0;
-            if (i>CYE_NUM_ASCII_DISP_CHARS)
-                i=CYE_NUM_ASCII_DISP_CHARS;
-            i = CYE_NUM_ASCII_DISP_CHARS+1-i;
+            if (i>NUM_ASCII_DISP_CHARS)
+                i=NUM_ASCII_DISP_CHARS;
+            i = NUM_ASCII_DISP_CHARS+1-i;
             // print
-            PRINTCHAR(CYE_ASCII_DISP_CHARS[i]);
+            PRINTCHAR(ASCII_DISP_CHARS[i]);
             // next pixel
             pix++;
         }
@@ -185,67 +185,67 @@ void CYE_ImgShortDumpAsciiSerial(short *img, short numrows, short numcolumns, sh
     }
 }
 
+#ifdef __UNUSED
 // Below is an older version of this function we are retaining, commented out, in case we need to 
 // revive it.
-/*
-   void CYE_ImgShortDumpAsciiSerial(short *img, short numrows, short numcolumns, short mini, short maxi) {
-   short i,m,n,*pix,delta;
+void ImgShortDumpAsciiSerial(short *img, short numrows, short numcolumns, short mini, short maxi) {
+    short i,m,n,*pix,delta;
 
-// if mini==0 then we compute minimum
-if (mini==0) {
-mini = *img;
-for (i=0,pix=img; i<numrows*numcolumns; ++i,++pix) {
-if (*pix<mini)
-mini=*pix;
-}
-}
-// if maxi==0 then we compute maximum
-if (maxi==0) {
-maxi = *img;
-for (i=0,pix=img; i<numrows*numcolumns; ++i,++pix) {
-if (*pix>maxi)
-maxi=*pix;
-}
-}
-// Compute delta value for display
-delta = maxi-mini;
-delta = delta / CYE_NUM_ASCII_DISP_CHARS;
+    // if mini==0 then we compute minimum
+    if (mini==0) {
+        mini = *img;
+        for (i=0,pix=img; i<numrows*numcolumns; ++i,++pix) {
+            if (*pix<mini)
+                mini=*pix;
+        }
+    }
+    // if maxi==0 then we compute maximum
+    if (maxi==0) {
+        maxi = *img;
+        for (i=0,pix=img; i<numrows*numcolumns; ++i,++pix) {
+            if (*pix>maxi)
+                maxi=*pix;
+        }
+    }
+    // Compute delta value for display
+    delta = maxi-mini;
+    delta = delta / NUM_ASCII_DISP_CHARS;
 
-// This portion can be deleted eventually...
-char debugstring[100];
-sprintf(debugstring,"maxi=%d mini=%d delta=%d\n",maxi,mini,delta);
-Serial.print(debugstring);
+    // This portion can be deleted eventually...
+    char debugstring[100];
+    sprintf(debugstring,"maxi=%d mini=%d delta=%d\n",maxi,mini,delta);
+    Serial.print(debugstring);
 
-// Loop through and dump image
-pix=img;
-for (m=0; m<numrows; ++m) {
-for (n=0; n<numcolumns; ++n) {
-// rescale pixel value to 0...9
-i = *pix - mini;
-i = i / delta;
-if (i<0)
-i=0;
-if (i>9)
-i=9;
-// print
-Serial.print(CYE_ASCII_DISP_CHARS[i]);
-// next pixel
-pix++;
+    // Loop through and dump image
+    pix=img;
+    for (m=0; m<numrows; ++m) {
+        for (n=0; n<numcolumns; ++n) {
+            // rescale pixel value to 0...9
+            i = *pix - mini;
+            i = i / delta;
+            if (i<0)
+                i=0;
+            if (i>9)
+                i=9;
+            // print
+            Serial.print(ASCII_DISP_CHARS[i]);
+            // next pixel
+            pix++;
+        }
+        Serial.println(" ");
+    }
 }
-Serial.println(" ");
-}
-}
- */
+#endif
 
 /*------------------------------------------------------------------------
-  CYE_ImgShortDumpMatlabSerial -- Dumps image to the screen in a manner
+  ImgShortDumpMatlabSerial -- Dumps image to the screen in a manner
   that may be copied into MATLAB.
 VARIABLES:
 img: input image
 numrows,numcolumns: number of rows and columns in image
 STATUS: UNTESTED
  */  
-void CYE_ImgShortDumpMatlabSerial(short *img, unsigned char numrows, unsigned char numcols) {
+void ImgShortDumpMatlabSerial(short *img, unsigned char numrows, unsigned char numcols) {
     short *pimg = img;
     unsigned char row,col;
     PRINTSTR("Dat = [\n");
@@ -266,7 +266,7 @@ void CYE_ImgShortDumpMatlabSerial(short *img, unsigned char numrows, unsigned ch
 //========================================================================
 
 /*------------------------------------------------------------------------
-  CYE_ImgShortFindMinMax -- Finds both the darkest and brightest pixels
+  ImgShortFindMinMax -- Finds both the darkest and brightest pixels
   in the image.
 VARIABLES:
 img: input image
@@ -275,7 +275,7 @@ mini,maxi: pointers to output variables that will contain the minimum
 and maximum pixel values
 STATUS: UNTESTED
  */  
-void CYE_ImgShortFindMinMax(short *img, unsigned char numrows, unsigned char numcols, short *mini, short *maxi) {
+void ImgShortFindMinMax(short *img, unsigned char numrows, unsigned char numcols, short *mini, short *maxi) {
     short *pimg=img;
     unsigned char row,col;
     *mini = 0xFFFF; // initialize
@@ -291,7 +291,7 @@ void CYE_ImgShortFindMinMax(short *img, unsigned char numrows, unsigned char num
 }
 
 /*------------------------------------------------------------------------
-  CYE_ImgShortFindMax -- Finds the minimum or maximum value of an image and
+  ImgShortFindMax -- Finds the minimum or maximum value of an image and
   returns the row and column. Polarity value allows finding of minimum 
   instead of maximum.
 VARIABLES:
@@ -301,7 +301,7 @@ polarity: 0=find maximum, 1=find minimum
 winrow,wincol: row and column of winning pixel
 STATUS: UNTESTED
  */ 
-void CYE_ImgShortFindMax(short *img, unsigned char numrows, unsigned char numcols, unsigned char polarity, unsigned char *winrow, unsigned char *wincol) {
+void ImgShortFindMax(short *img, unsigned char numrows, unsigned char numcols, unsigned char polarity, unsigned char *winrow, unsigned char *wincol) {
     short *pimg=img,val,bestval;
     unsigned char row,col;
 
@@ -322,14 +322,14 @@ void CYE_ImgShortFindMax(short *img, unsigned char numrows, unsigned char numcol
 }
 
 /*------------------------------------------------------------------------
-  CYE_ImgShortMin -- Returns the minimum pixel value in an image.
+  ImgShortMin -- Returns the minimum pixel value in an image.
 VARIABLES:
 A: input image
 numpix: number of pixels e.g. rows * columns
 OUTPUT: minimum pixel value
 STATUS: UNTESTED
  */
-short CYE_ImgShortMin(short *A, unsigned short numpix) {
+short ImgShortMin(short *A, unsigned short numpix) {
     short *pa = A;
     short minval;
     unsigned short pixnum;
@@ -344,14 +344,14 @@ short CYE_ImgShortMin(short *A, unsigned short numpix) {
 }
 
 /*------------------------------------------------------------------------
-  CYE_ImgShortMax -- Returns the maximum pixel value in an image.
+  ImgShortMax -- Returns the maximum pixel value in an image.
 VARIABLES:
 A: input image
 numpix: number of pixels e.g. rows * columns
 OUTPUT: maximum pixel value
 STATUS: UNTESTED
  */
-short CYE_ImgShortMax(short *A, unsigned short numpix) {
+short ImgShortMax(short *A, unsigned short numpix) {
     short *pa = A;
     short maxval;
     unsigned short pixnum;
@@ -370,7 +370,7 @@ short CYE_ImgShortMax(short *A, unsigned short numpix) {
 //========================================================================
 
 /*------------------------------------------------------------------------
-  CYE_ImgShortDiff -- Computes pixel-wise difference between two images e.g.
+  ImgShortDiff -- Computes pixel-wise difference between two images e.g.
   computes a simple frame difference. Input and output images are all short.
 VARIABLES:
 A,B: input image
@@ -378,7 +378,7 @@ D: output image containing A-B
 numpix: number of pixels e.g. rows * columns
 STATUS: UNTESTED
  */
-void CYE_ImgShortDiff(short *A, short *B, short *D, unsigned short numpix) {
+void ImgShortDiff(short *A, short *B, short *D, unsigned short numpix) {
     short *pa,*pb,*pd;
     pa=A; pb=B; pd=D;
     unsigned short pixnum;
@@ -391,7 +391,7 @@ void CYE_ImgShortDiff(short *A, short *B, short *D, unsigned short numpix) {
 }
 
 /*------------------------------------------------------------------------
-  CYE_ImgShortHPF -- Implements a time-domain high pass filter. Image I is
+  ImgShortHPF -- Implements a time-domain high pass filter. Image I is
   the input image, image L is a time-domain low passed version of I, and
   image H is a high passed version. WORK ON THIS FUNCTION.
 VARIABLES:
@@ -402,7 +402,7 @@ numpix: number of pixels e.g. rows * columns
 shiftalpha: shifting amount used to implement time constant
 STATUS: UNTESTED
  */
-void CYE_ImgShortHPF(short *I, short *L, short *H, short numpix, char shiftalpha) {
+void ImgShortHPF(short *I, short *L, short *H, short numpix, char shiftalpha) {
     short pix,*pi,*pl,*ph;
     pi=I; pl=L; ph=H;
     for (pix=0; pix<numpix; ++pix) {
@@ -422,7 +422,7 @@ void CYE_ImgShortHPF(short *I, short *L, short *H, short numpix, char shiftalpha
 //========================================================================
 
 /*------------------------------------------------------------------------
-  CYE_ImgShortAddCharFPN -- Adds an FPN to an image. Allows the FPN to be
+  ImgShortAddCharFPN -- Adds an FPN to an image. Allows the FPN to be
   multiplied. Basically this function implements A = A + F * mult
   where F is an image of unsigned chars.
 VARIABLES:
@@ -432,7 +432,7 @@ numpix: number of pixels e.g. rows * columns
 mult: multiplier
 STATUS: UNTESTED
  */
-void CYE_ImgShortAddCharFPN(short *A, unsigned char *F, unsigned short numpix, unsigned char mult) {
+void ImgShortAddCharFPN(short *A, unsigned char *F, unsigned short numpix, unsigned char mult) {
     short *pa=A;
     unsigned char *pf=F;
     unsigned short pixnum;
@@ -445,7 +445,7 @@ void CYE_ImgShortAddCharFPN(short *A, unsigned char *F, unsigned short numpix, u
 }
 
 /*------------------------------------------------------------------------
-  CYE_ImgCharMakeFPN -- Generates a random fixed pattern noise (FPN) to 
+  ImgCharMakeFPN -- Generates a random fixed pattern noise (FPN) to 
   be used to add still texture to an image. This can be added to high
   passed images so that when there is no motion there is still some 
   texture so that motion sensing algorithms measure zero motion. Yes, this
@@ -459,7 +459,7 @@ modval: number of levels in the image, e.g. 2 makes a binary image,
 3 makes an image having values 0,1,2, and so on.
 STATUS: UNTESTED
  */
-void CYE_ImgCharMakeFPN(unsigned char *F, unsigned short numpix, unsigned char modval) {
+void ImgCharMakeFPN(unsigned char *F, unsigned short numpix, unsigned char modval) {
     unsigned char *pf = F;
     unsigned short pixnum;
 
@@ -474,7 +474,7 @@ void CYE_ImgCharMakeFPN(unsigned char *F, unsigned short numpix, unsigned char m
 //========================================================================
 
 /*------------------------------------------------------------------------
-  CYE_SubwinShort2D -- Extracts a 2D subwindow from a 2D image of shorts. 
+  SubwinShort2D -- Extracts a 2D subwindow from a 2D image of shorts. 
 VARIABLES:
 I: input image
 S: output image
@@ -486,7 +486,7 @@ startcol: starting column of window
 numcols: number of columns of subwindow
 STATUS: UNTESTED
  */
-void CYE_SubwinShort2D(short *I, short *S, char Irows, char Icols, char startrow, char numrows, char startcol, char numcols) {
+void SubwinShort2D(short *I, short *S, char Irows, char Icols, char startrow, char numrows, char startcol, char numcols) {
     (void)Irows;
     short *pi,*ps;
     char r,c;
@@ -503,7 +503,7 @@ void CYE_SubwinShort2D(short *I, short *S, char Irows, char Icols, char startrow
 }
 
 /*------------------------------------------------------------------------
-  CYE_SubwinShort2Dto1D -- Extracts a subwindow from a 2D image of shorts
+  SubwinShort2Dto1D -- Extracts a subwindow from a 2D image of shorts
   and then sums rows or columns to form a 1D image. This is a simple way
   to generate 1D images from a 2D image, using a mathematical equivalent
   of on-chip binning. Note that a SUM is used for the resulting pixels,
@@ -519,7 +519,7 @@ orientation: 1 means rectangles are horizontal, e.g. window is averaged
 row-wise, 2 means rectangles ore vertical.
 STATUS: UNTESTED
  */
-void CYE_SubwinShort2Dto1D(short *I, short *S, char Irows, char Icols, char subrow, char subcol, char Snumpix, char Spixlength, char orientation) {
+void SubwinShort2Dto1D(short *I, short *S, char Irows, char Icols, char subrow, char subcol, char Snumpix, char Spixlength, char orientation) {
     (void)Irows;
 
     // first clear image S

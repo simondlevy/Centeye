@@ -1,5 +1,5 @@
 /*
-   GUI.cpp
+   GUIClient.cpp
    Centeye Library to interface with the Processing GUI
 
    Copyright (c) 2012 Centeye, Inc. 
@@ -32,18 +32,14 @@
  */
 
 #include <Arduino.h>
-
-#include <GUI.h>
-
-//class instance to be referenced in sketch
-ArduEyeGUIClass ArduEyeGUI;
+#include <GUIClient.h>
 
 /*********************************************************************/
 //	Constructor
 //	Defaults to no GUI, no GUI commands will be sent
 /*********************************************************************/
 
-ArduEyeGUIClass::ArduEyeGUIClass(void)
+GUIClient::GUIClient(void)
 {
     // initialize this instance's variables
     detected=0;	//arduGUI not detected
@@ -54,7 +50,7 @@ ArduEyeGUIClass::ArduEyeGUIClass(void)
 //	Enables the interface to start sending data to the GUI
 /*********************************************************************/
 
-void ArduEyeGUIClass::start(void)
+void GUIClient::start(void)
 {
     detected=1;	//GUI detected
 }
@@ -64,7 +60,7 @@ void ArduEyeGUIClass::start(void)
 //	Disables the interface so that no data is sent to the GUI
 /*********************************************************************/
 
-void ArduEyeGUIClass::stop(void)
+void GUIClient::stop(void)
 {
     detected=0;	//GUI not detected
 }
@@ -79,7 +75,7 @@ void ArduEyeGUIClass::stop(void)
 //	disables the GUI, is intercepted here, but still passed through.
 /*********************************************************************/
 
-void ArduEyeGUIClass::getCommand(char *command, int *argument) 
+void GUIClient::getCommand(char *command, int *argument) 
 {
     char cmdbuf[11];
     unsigned char i;
@@ -127,7 +123,7 @@ void ArduEyeGUIClass::getCommand(char *command, int *argument)
 //	This is used for special characters
 /*********************************************************************/
 
-void ArduEyeGUIClass::sendEscChar(byte char_out)
+void GUIClient::sendEscChar(byte char_out)
 { 
   Serial.write(ESC);		//send escape char
   Serial.write(char_out);	//send special char
@@ -140,7 +136,7 @@ void ArduEyeGUIClass::sendEscChar(byte char_out)
 //	it is a regular data byte.
 /*********************************************************************/
 
-void ArduEyeGUIClass::sendDataByte(byte data_out)
+void GUIClient::sendDataByte(byte data_out)
 {
   if(data_out!=ESC)
 	Serial.write(data_out);		//send data byte
@@ -163,7 +159,7 @@ void ArduEyeGUIClass::sendDataByte(byte data_out)
 //	size: number of pixels in image (rows*cols)
 /*********************************************************************/
 
-void ArduEyeGUIClass::sendImage(byte rows,byte cols,short *pixels,
+void GUIClient::sendImage(byte rows,byte cols,short *pixels,
 					  short size)
 {
 
@@ -207,7 +203,7 @@ void ArduEyeGUIClass::sendImage(byte rows,byte cols,short *pixels,
 //	size: number of pixels in image (rows*cols)
 /*********************************************************************/
 
-void ArduEyeGUIClass::sendImage(byte rows,byte cols,char *pixels,
+void GUIClient::sendImage(byte rows,byte cols,char *pixels,
 					  short size)
 {
 
@@ -248,7 +244,7 @@ void ArduEyeGUIClass::sendImage(byte rows,byte cols,char *pixels,
 //	which means vx will display on the left and vy on the right
 /*********************************************************************/
 
-void ArduEyeGUIClass::sendVectors(byte rows,byte cols,short *vector,short num_vectors)
+void GUIClient::sendVectors(byte rows,byte cols,short *vector,short num_vectors)
 { 
 
   union
@@ -296,7 +292,7 @@ void ArduEyeGUIClass::sendVectors(byte rows,byte cols,short *vector,short num_ve
 //	which means vx will display on the left and vy on the right
 /*********************************************************************/
 
-void ArduEyeGUIClass::sendVectors(byte rows,byte cols,char 							    *vector,short num_vectors)
+void GUIClient::sendVectors(byte rows,byte cols, int8_t *vector, short num_vectors)
 { 
 
   if(detected)	//if GUI is detected, send bytes
@@ -333,7 +329,7 @@ void ArduEyeGUIClass::sendVectors(byte rows,byte cols,char 							    *vector,sh
 //	on a 16x16 array, highlights the points (2,4) and (10,11)
 /*********************************************************************/
 
-void ArduEyeGUIClass::sendPoints(byte rows,byte cols,byte *points,short 				         num_points)
+void GUIClient::sendPoints(byte rows,byte cols,byte *points,short 				         num_points)
 { 
   if(detected)	//if GUI is detected, send bytes
   {

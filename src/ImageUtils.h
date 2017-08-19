@@ -1,6 +1,6 @@
 /*
 ===============================================================================
-Images.h Basic functions to handle images
+ImagesUtils.h Basic functions to handle images
 
 Copyright (c) 2012 Centeye, Inc. 
 All rights reserved.
@@ -37,22 +37,22 @@ January 22, 2012: initial release
 February 17, 2012: includes Arduino.h or WProgram.h depending on Arduino IDE version
 */
 
-#ifndef CYE_Images_v1_h
-#define CYE_Images_v1_h
+#ifndef Images_v1_h
+#define Images_v1_h
 
-void CYE_ImgShortCopy(short *A, short *B, unsigned short numpix);
-void CYE_ImgShortCopy(char *A, char *B, unsigned short numpix);
-void CYE_ImgShortDumpAsciiSerial(short *img, short numrows, short numcolumns, short mini, short maxi);
-void CYE_ImgShortDumpMatlabSerial(short *img, unsigned char numrows, unsigned char numcols);
-void CYE_ImgShortFindMinMax(short *img, unsigned char numrows, unsigned char numcols, short *mini, short *maxi);
-void CYE_ImgShortFindMax(short *img, unsigned char numrows, unsigned char numcols, unsigned char polarity, unsigned char *winrow, unsigned char *wincol);
-short CYE_ImgShortMin(short *A, unsigned short numpix);
-short CYE_ImgShortMax(short *A, unsigned short numpix);
-void CYE_ImgShortDiff(short *A, short *B, short *D, unsigned short numpix);
-void CYE_ImgShortHPF(short *I, short *L, short *H, short numpix, char shiftalpha);
-void CYE_ImgShortAddCharFPN(short *A, unsigned char *F, unsigned short numpix, unsigned char mult);
-void CYE_ImgCharMakeFPN(unsigned char *F, unsigned short numpix, unsigned char modval);
-void CYE_SubwinShort2D(short *I, short *S, char Irows, char Icols, char startrow, char numrows, char startcol, char numcols);
-void CYE_SubwinShort2Dto1D(short *I, short *S, char Irows, char Icols, char subrow, char subcol, char Snumpix, char Spixlength, char orientation);
+void ImgShortCopy(short *A, short *B, unsigned short numpix);
+void ImgShortCopy(char *A, char *B, unsigned short numpix);
+void ImgShortDumpAsciiSerial(short *img, short numrows, short numcolumns, short mini, short maxi);
+void ImgShortDumpMatlabSerial(short *img, unsigned char numrows, unsigned char numcols);
+void ImgShortFindMinMax(short *img, unsigned char numrows, unsigned char numcols, short *mini, short *maxi);
+void ImgShortFindMax(short *img, unsigned char numrows, unsigned char numcols, unsigned char polarity, unsigned char *winrow, unsigned char *wincol);
+short ImgShortMin(short *A, unsigned short numpix);
+short ImgShortMax(short *A, unsigned short numpix);
+void ImgShortDiff(short *A, short *B, short *D, unsigned short numpix);
+void ImgShortHPF(short *I, short *L, short *H, short numpix, char shiftalpha);
+void ImgShortAddCharFPN(short *A, unsigned char *F, unsigned short numpix, unsigned char mult);
+void ImgCharMakeFPN(unsigned char *F, unsigned short numpix, unsigned char modval);
+void SubwinShort2D(short *I, short *S, char Irows, char Icols, char startrow, char numrows, char startcol, char numcols);
+void SubwinShort2Dto1D(short *I, short *S, char Irows, char Icols, char subrow, char subcol, char Snumpix, char Spixlength, char orientation);
 	
 #endif
