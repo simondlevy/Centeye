@@ -39,8 +39,7 @@
    ===============================================================================
  */
 
-#ifndef ArduEye_GUI_h
-#define ArduEye_GUI_h
+#pragma once
 
 #include <Arduino.h>
 
@@ -124,5 +123,3 @@ class GUIClient
 
 
 };
-
-#endif

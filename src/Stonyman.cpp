@@ -186,9 +186,9 @@ void Stonyman::setConfig(uint8_t gain, uint8_t selamp, uint8_t cvdda)
     uint16_t config=gain+(selamp*8)+(cvdda*16);	//form register value
 
     if(selamp==1)	//if selamp is 1, set use_amp variable to 1
-        use_amp=1;
+        use_amp = true;
     else 
-        use_amp=0;
+        use_amp = false;
 
     // Note that config will have the following form binary form:
     // 000csggg where c=cvdda, s=selamp, ggg=gain (3 bits)
@@ -203,12 +203,12 @@ void Stonyman::setAmpGain(uint8_t gain)
     if((gain>0)&&(gain<8))	//if gain is a proper value, connect amp
     {
         config=gain+8+16;	//gain+(selamp=1)+(cvdda=1)
-        use_amp=1;	//using amplifier
+        use_amp = true;	//using amplifier
     }
     else	//if gain is zero or outside range, bypass amp
     {
         config=16;	//(cvdda=1)
-        use_amp=0;	//bypassing amplifier
+        use_amp = false;	//bypassing amplifier
     }
 
     set_pointer_value(SMH_SYS_CONFIG,config);	//set config register
@@ -253,25 +253,25 @@ void Stonyman::setBinning(uint8_t hbin,uint8_t vbin)
     set_pointer_value(SMH_SYS_VSW,vsw);
 }
 
-void Stonyman::calcMask(uint16_t *img, uint16_t size, uint8_t *mask,uint16_t *mask_base)
+void Stonyman::calcMask(uint16_t *img, uint16_t size, uint8_t *mask,uint16_t *maskBase)
 {
-    *mask_base = 10000; // e.g. "high"
+    *maskBase = 10000; // e.g. "high"
 
     for (int i=0; i<size; ++i)
-        if (img[i]<(*mask_base))	//find the min value for mask_base
-            *mask_base = img[i];
+        if (img[i]<(*maskBase))	//find the min value for maskBase
+            *maskBase = img[i];
 
     // generate calibration mask
     for (int i=0; i<size; ++i)
-        mask[i] = img[i] - *mask_base;	//subtract min value for mask
+        mask[i] = img[i] - *maskBase;	//subtract min value for mask
 }
 
-void Stonyman::applyMask(uint16_t *img, uint16_t size, uint8_t *mask, uint16_t mask_base)
+void Stonyman::applyMask(uint16_t *img, uint16_t size, uint8_t *mask, uint16_t maskBase)
 {
     // Subtract calibration mask
     for (int i=0; i<size;++i) 
     {
-        img[i] -= mask_base+mask[i];  //subtract FPN mask
+        img[i] -= maskBase+mask[i];  //subtract FPN mask
         img[i]=-img[i];          //negate image so it displays properly
     }
 }
@@ -522,10 +522,10 @@ void Stonyman::findMaxAnalog(
         uint8_t numcols,
         uint8_t colskip, 
         uint8_t input,
-        uint8_t *max_row, 
-        uint8_t *max_col)
+        uint8_t *maxrow, 
+        uint8_t *maxcol)
 {
-    find_max(rowstart, numrows, rowskip, colstart, numcols, colskip, input, max_row, max_col, false);
+    find_max(rowstart, numrows, rowskip, colstart, numcols, colskip, input, maxrow, maxcol, false);
 }
 
 void Stonyman::findMaxDigital(
@@ -536,10 +536,10 @@ void Stonyman::findMaxDigital(
         uint8_t numcols,
         uint8_t colskip, 
         uint8_t input,
-        uint8_t *max_row, 
-        uint8_t *max_col)
+        uint8_t *maxrow, 
+        uint8_t *maxcol)
 {
-    find_max(rowstart, numrows, rowskip, colstart, numcols, colskip, input, max_row, max_col, true);
+    find_max(rowstart, numrows, rowskip, colstart, numcols, colskip, input, maxrow, maxcol, true);
 }
 
 void Stonyman::find_max(
@@ -550,8 +550,8 @@ void Stonyman::find_max(
         uint8_t numcols,
         uint8_t colskip, 
         uint8_t input,
-        uint8_t *max_row, 
-        uint8_t *max_col,
+        uint8_t *maxrow, 
+        uint8_t *maxcol,
         bool use_digital)
 {
     (void)use_digital;
@@ -608,8 +608,8 @@ void Stonyman::find_max(
         inc_value(rowskip); // go to next row
     }
 
-    *max_row = bestrow;
-    *max_col = bestcol;
+    *maxrow = bestrow;
+    *maxcol = bestcol;
 }
 
 void Stonyman::chipToMatlabAnalog(uint8_t input) 

@@ -30,8 +30,7 @@ those of the authors and should not be interpreted as representing official
 policies, either expressed or implied, of Centeye, Inc.
 */
 
-#ifndef _STONYMAN_INCLUDED
-#define _STONYMAN_INCLUDED
+#pragma once
 
 #include <stdint.h>
 
@@ -71,30 +70,40 @@ policies, either expressed or implied, of Centeye, Inc.
 #define MAX_PIXELS (MAX_ROWS*MAX_COLS)
 
 /**
- *	Stonyman
+ *	A class for interacting with the Stonyman2 vision chip from Centeye, Inc.
+ *  For documentation on this chip see 
+ *  https://github.com/simondlevy/Centeye/blob/master/extras/docs/Stonyman_Hawksbill_ChipInstructions_Rev10_20130312.pdf
  */
 class Stonyman 
 {
     public:
 
         /**
-         * Constructor
+         * Creates a Stonyman object using four digital input signals to the chip.
+         * @param resp pin for RESP signal
+         * @param incp pin for INCP signal
+         * @param resv pin for RESV signal
+         * @param incv pin for INCV signal
+         * @param inphi pin for optional INPHI (amplifier) signal; tie signal to GND if unused
          */
         Stonyman(uint8_t resp, uint8_t incp, uint8_t resv, uint8_t incv, uint8_t inphi=0);
 
         /**
          * Initializes the vision chips for normal operation.  Sets vision
          * chip pins to low outputs, clears chip registers, sets biases and
-         * config register.  If no parameters are passed in, default values
-         * are used.
+         * config register.  
+         * @param vref value for VREF register
+         * @param nbias value for NBIAS register
+         * @param aobias value for AOBIAS register
+         * @param useAmp flag for using amplifier
          */
-        void begin(uint8_t vref=30, uint8_t nbias=40, uint8_t aobias=40, bool selamp=false); 
+        void begin(uint8_t vref=30, uint8_t nbias=40, uint8_t aobias=40, bool useAmp=false); 
 
         /**
          * Sets configuration register
          *
          * @param gain amplifier gain 1-7
-         * @param selamp (0) bypasses amplifier, (1) connects it
+         * @param useAmp (0) bypasses amplifier, (1) connects it
          * @param cvdda  (1) connect vdda, always should be connected
          *
          * Example 1: To configure the chip to bypass the amplifier:
@@ -103,10 +112,10 @@ class Stonyman
          * Example 2: To use the amplifier and set the gain to 4:
          * setConfig(4,1,1);
          */
-        void setConfig(uint8_t gain, uint8_t selamp, uint8_t cvdda=1);
+        void setConfig(uint8_t gain, uint8_t useAmp, uint8_t cvdda=1);
 
         /**
-         *  A friendlier version of setConfig.  If amplifier gain is set to 
+         * Provides a friendlier version of setConfig.  If amplifier gain is set to 
          * zero, amplifier is bypassed.  Otherwise the appropriate amplifier
          * gain (range 1-7) is set.
          *
@@ -162,21 +171,29 @@ class Stonyman
          * of paper placed over the optics).  Take an image using the 
          * getImage function.  Pass the uint16_t "img" array and the "size"
          * number of pixels, along with a uint8_t "mask" array to hold
-         * the FPN mask and mask_base for the FPN mask base.  Function will
-         * populate the mask array and mask_base variable with the FPN mask,
+         * the FPN mask and maskBase for the FPN mask base.  Function will
+         * populate the mask array and maskBase variable with the FPN mask,
          * which can then be used with the applMask function. 
+         * @param img image pixels
+         * @param size number of pixels
+         * @param mask the image mask (should be same size as img)
+         * @param maskBase gets smallest value of any pixel in img
          */
-        void calcMask(uint16_t *img, uint16_t size, uint8_t *mask, uint16_t *mask_base);
+        void calcMask(uint16_t *img, uint16_t size, uint8_t *mask, uint16_t *maskBase);
 
         /**
-         * Given the "mask" and "mask_base" variables calculated in        
+         * Given the "mask" and "maskBase" variables calculated in        
          * calcMask, and a current image, subtracts the
          * mask to provide a calibrated image.
-         */
-        void applyMask(uint16_t *img, uint16_t size, uint8_t *mask, uint16_t mask_base);
+         * @param img image pixels
+         * @param size number of pixels
+         * @param mask the image mask (should be same size as img)
+         * @param maskBase previously-obtained smallest value of any pixel in img
+          */
+        void applyMask(uint16_t *img, uint16_t size, uint8_t *mask, uint16_t maskBase);
 
         /**
-         * Acquires a box section of a Stonyman or Hawksbill 
+         * Acquires a box section of an image
          * from the analog output, and and saves to image array img.  Note 
          * that images are read out in 
          * raster manner (e.g. row wise) and stored as such in a 1D array. 
@@ -189,14 +206,15 @@ class Stonyman
          * @param colstart first column to acquire
          * @param numcols number of columns to acquire
          * @param colskip skipping between columns
+         * @param input which analog input pin to use
          * 
          * Examples:
          *
-         * getImageAnalog(img,16,8,1,24,8,1,0): 
+         * &nbsp;&nbsp;&nbsp;&nbsp;getImageAnalog(img,16,8,1,24,8,1,0): 
          * Grab an 8x8 window of pixels at raw resolution starting at row 
          * 16, column 24, from chip using onboard ADC at input 0
          *
-         * getImageAnalog(img,0,14,8,0,14,8,2): 
+         * &nbsp;&nbsp;&nbsp;&nbsp;getImageAnalog(img,0,14,8,0,14,8,2): 
          * Grab entire Stonyman chip when using 8x8 binning. Grab from input 2.
          */
         void getImageAnalog(
@@ -209,6 +227,10 @@ class Stonyman
                 uint8_t colskip, 
                 uint8_t input);
 
+        /**
+          * Digital (SPI) version of above.
+          * @param input pin for chip-select signal
+          */ 
         void getImageDigital(
                 uint16_t *img, 
                 uint8_t rowstart, 
@@ -238,10 +260,11 @@ class Stonyman
          *
          * Examples:
          *
-         * getImage(img,16,8,1,24,8,1,0): 
+         * &nbsp;&nbsp;&nbsp;&nbsp;getImage(img,16,8,1,24,8,1,0): 
          * Grab an 8x8 window of pixels at raw resolution starting at row 
          * 16, column 24, from chip using onboard ADC at input 0
-         * getImage(img,0,14,8,0,14,8,2): 
+         *
+         * &nbsp;&nbsp;&nbsp;&nbsp;getImage(img,0,14,8,0,14,8,2): 
          * Grab entire Stonyman chip when using 8x8 binning. Grab from input 2.
          */
         void getImageRowSumAnalog(
@@ -254,6 +277,10 @@ class Stonyman
                 uint8_t colskip, 
                 uint8_t input);
 
+        /**
+          * Digital (SPI) version of above.
+          * @param input pin for chip-select signal
+          */ 
         void getImageRowSumDigital(
                 uint16_t *img, 
                 uint8_t rowstart, 
@@ -279,15 +306,15 @@ class Stonyman
          * @param colstart first column to acquire
          * @param numcols number of columns to acquire
          * @param colskip skipping between columns
-         * @param analog which analog input to use
+         * @param input which analog input pin to use
          * 
          * Examples:
          *
-         * getImage(img,16,8,1,24,8,1,0): 
+         * &nbsp;&nbsp;&nbsp;&nbsp;getImage(img,16,8,1,24,8,1,0): 
          * Grab an 8x8 window of pixels at raw resolution starting at row 
          * 16, column 24, from chip using onboard ADC at input 0
          *
-         * getImage(img,0,14,8,0,14,8,2): 
+         * &nbsp;&nbsp;&nbsp;&nbsp;getImage(img,0,14,8,0,14,8,2): 
          * Grab entire Stonyman chip when using 8x8 binning. Grab from input 2.
          */
         void getImageColSumAnalog(
@@ -300,6 +327,10 @@ class Stonyman
                 uint8_t colskip, 
                 uint8_t input);
 
+        /**
+          * Digital (SPI) version of above.
+          * @param input pin for chip-select signal
+          */ 
         void getImageColSumDigital(
                 uint16_t *img, 
                 uint8_t rowstart, 
@@ -323,12 +354,13 @@ class Stonyman
          * @param numcols number of columns to search
          * @param colskip skipping between columns
          * @param input which analog input to use
-         * @param max_row (output) pointer to variable to write row of brightest pixel
-         * @param max_col (output) pointer to variable to write column of brightest pixel
+         * @param maxrow (output) pointer to variable to write row of brightest pixel
+         * @param maxcol (output) pointer to variable to write column of brightest pixel
+         * @param input pin for chip-select signal
          *
          * Example:
          *
-         * findMaxAnalog(8,104,1,8,104,1,0,&rowwinner, &colwinner): 
+         * &nbsp;&nbsp;&nbsp;&nbsp;findMaxAnalog(8,104,1,8,104,1,0,&rowwinner, &colwinner): 
          * Search rows 8...104 and columns 8...104 for brightest pixel, using analog input 0
          */
         void findMaxAnalog(
@@ -339,10 +371,14 @@ class Stonyman
                 uint8_t numcols, 
                 uint8_t colskip, 
                 uint8_t input,
-                uint8_t *max_row, 
-                uint8_t *max_col);
+                uint8_t *maxrow, 
+                uint8_t *maxcol);
 
-        void findMaxDigital(
+        /**
+          * Digital (SPI) version of above.
+          * @param input pin for chip-select signal
+          */ 
+         void findMaxDigital(
                 uint8_t rowstart, 
                 uint8_t numrows, 
                 uint8_t rowskip, 
@@ -350,8 +386,8 @@ class Stonyman
                 uint8_t numcols, 
                 uint8_t colskip, 
                 uint8_t input,
-                uint8_t *max_row, 
-                uint8_t *max_col);
+                uint8_t *maxrow, 
+                uint8_t *maxcol);
 
         /**
          * Dumps the entire contents of a Stonyman or 
@@ -361,6 +397,11 @@ class Stonyman
          * @param input which analog input pin to use
          */
         void chipToMatlabAnalog(uint8_t input);
+
+        /**
+          * Digital (SPI) version of above.
+          * @param input pin for chip-select signal
+          */ 
         void chipToMatlabDigital(uint8_t input);
 
         /**
@@ -378,11 +419,11 @@ class Stonyman
          *
          * Examples:
          *
-         * sectionToMatlab(16,8,1,24,8,1,0): 
+         * &nbsp;&nbsp;&nbsp;&nbsp;sectionToMatlab(16,8,1,24,8,1,0): 
          * Grab an 8x8 window of pixels at raw resolution starting at row 
          * 16, column 24, from onboard ADC at chip 0
          *
-         * sectionToMatlab(0,14,8,0,14,8,2): 
+         * &nbsp;&nbsp;&nbsp;&nbsp;sectionToMatlab(0,14,8,0,14,8,2): 
          * Grab entire Stonyman chip when using 8x8 binning. Grab from input 
          * 2.
          */
@@ -395,7 +436,11 @@ class Stonyman
                 uint8_t colskip, 
                 uint8_t input);   
 
-        void sectionToMatlabDigital(
+        /**
+          * Digital (SPI) version of above.
+          * @param input pin for chip-select signal
+          */ 
+         void sectionToMatlabDigital(
                 uint8_t rowstart, 
                 uint8_t numrows, 
                 uint8_t rowskip, 
@@ -456,8 +501,8 @@ class Stonyman
                 uint8_t numcols, 
                 uint8_t colskip, 
                 uint8_t input,
-                uint8_t *max_row, 
-                uint8_t *max_col,
+                uint8_t *maxrow, 
+                uint8_t *maxcol,
                 bool use_digital);
 
         void chip_to_matlab(uint8_t input, bool use_digital);
@@ -498,5 +543,3 @@ class Stonyman
         //	register
         void set_pointer_value(uint8_t ptr,uint16_t val);
 };
-
-#endif

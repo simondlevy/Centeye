@@ -33,72 +33,40 @@ policies, either expressed or implied, of Centeye, Inc.
 #include <OpticalFlow.h>
 #include <stdint.h>
 
-/*********************************************************************/
-//	LPF
-//	Send in a new optical flow measurement and the filtered optical
-//	flow value will be changed by ((*new_OF)-(*filtered_OF))*alpha
-//	alpha should be between 0-1 
-/*********************************************************************/
-
 void LPF(int16_t *filtered_OF, int16_t *new_OF, float alpha)
 {
     (*filtered_OF)=(*filtered_OF)+((float)(*new_OF)-(*filtered_OF))	*alpha;
 }
 
-/*********************************************************************/
-//	Accumulate
-//	The current optical flow value is added to the accumulation sum
-//	only if it crosses a threshold
-/*********************************************************************/      
-uint16_t Accumulate(int16_t *new_OF, int16_t *acc_OF, uint16_t threshold)
+bool Accumulate(int16_t new_OF, int16_t *acc_OF, uint16_t threshold)
 {
-    uint16_t reset=0;
+    bool reset = false;
 
-    if((*new_OF>threshold)||(*new_OF<-threshold))
+    if((new_OF>threshold)||(new_OF<-threshold))
     {
-        *acc_OF+=*new_OF;
-        reset=1;
+        *acc_OF += new_OF;
+        reset = true;
     }
 
     return reset;
 }
 
 
-/*********************************************************************/
-//	IIA_1D (uint16_t version)
-//	This is a one dimensional version of the image interpolation
-//	algorithm (IIA) as described by Prof. Mandyam Srinivasan. 
-//	curr_img and last_img are input line images. numpix is the number 
-//	of pixels in the image. scale is a scaling factor, mostly for the 
-//	benefit of the fixed-poing arithmetic performed here. out is the 
-//	resulting output optical flow.
-//
-//	VARIABLES:
-//	curr_img,last_img: first and second images
-//	numpix: number of pixels in line image
-//	scale: value of one pixel of motion (for scaling output)
-//	out: pointer to integer value for output.
-/*********************************************************************/
-
 void IIA_1D(uint16_t *curr_img, uint16_t *last_img, uint8_t numpix, uint16_t scale, uint16_t *out) 
 {
-    uint16_t *pleft,*pright,*pone,*ptwo;
-    long top,bottom;
-    uint8_t i;
-    int deltat,deltax;
-
     // Set up pointers
-    pleft = curr_img;	//left-shifted image
-    pone = curr_img+1;	//center image
-    pright = curr_img+2;	//right-shifted image
-    ptwo = last_img+1;	//time-shifted image
+    uint16_t * pleft = curr_img;	//left-shifted image
+    uint16_t * pone = curr_img+1;	//center image
+    uint16_t * pright = curr_img+2;	//right-shifted image
+    uint16_t * ptwo = last_img+1;	//time-shifted image
 
-    top=bottom=0;
+    int32_t top    = 0;
+    int32_t bottom =0;
 
-    for(i=0; i<numpix-2; ++i) 
+    for (uint8_t i=0; i<numpix-2; ++i) 
     {
-        deltat = *ptwo - *pone;    // temporal gradient i.e. pixel change over time
-        deltax = *pright - *pleft; // spatial gradient i.e. pixel  change over space
+        int32_t deltat = *ptwo - *pone;    // temporal gradient i.e. pixel change over time
+        int32_t deltax = *pright - *pleft; // spatial gradient i.e. pixel  change over space
 
         top += deltat * deltax;		//top summation
         bottom += deltax * deltax;	//bottom summation
@@ -116,41 +84,21 @@ void IIA_1D(uint16_t *curr_img, uint16_t *last_img, uint8_t numpix, uint16_t sca
     *out = 2*top*scale/bottom;
 }
 
-/*********************************************************************/
-//	IIA_1D (uint8_t version)
-//	This is a one dimensional version of the image interpolation
-//	algorithm (IIA) as described by Prof. Mandyam Srinivasan. 
-//	curr_img and last_img are input line images. numpix is the 
-//  number of pixels in the image. scale is a scaling factor, mostly 
-//  for the benefit of the fixed-poing arithmetic performed here. out 
-//  is the resulting output optical flow.
-//
-//	VARIABLES:
-//	curr_img,last_img: first and second images
-//	numpix: number of pixels in line image
-//	scale: value of one pixel of motion (for scaling output)
-//	out: pointer to integer value for output.
-/*********************************************************************/
-
 void IIA_1D(uint8_t *curr_img, uint8_t *last_img, uint8_t 	numpix, uint16_t scale, uint16_t *out) 
 {
-    uint8_t *pleft,*pright,*pone,*ptwo;
-    long top,bottom;
-    int deltat,deltax;
-    uint8_t i;
-
     // Set up pointers
-    pleft = curr_img;	//left-shifted image
-    pone = curr_img+1;	//center image
-    pright = curr_img+2;	//right-shifted image
-    ptwo = last_img+1;	//time-shifted image
+    uint8_t * pleft = curr_img;	//left-shifted image
+    uint8_t * pone = curr_img+1;	//center image
+    uint8_t * pright = curr_img+2;	//right-shifted image
+    uint8_t * ptwo = last_img+1;	//time-shifted image
 
-    top=bottom=0;
+    int32_t top    = 0;
+    int32_t bottom = 0;
 
-    for(i=0; i<numpix-2; ++i) 
+    for (uint8_t i=0; i<numpix-2; ++i) 
     {
-        deltat = (int)(*ptwo) - (int)(*pone); // temporal gradient i.e. 	// pixel change over time
-        deltax = (int)(*pright) - (int)(*pleft); // spatial gradient i.e. 	//pixel change over space
+        int32_t deltat = (int)(*ptwo) - (int)(*pone); // temporal gradient i.e. 	// pixel change over time
+        int32_t deltax = (int)(*pright) - (int)(*pleft); // spatial gradient i.e. 	//pixel change over space
         top += deltat * deltax;
         bottom += deltax * deltax;
 
@@ -168,28 +116,9 @@ void IIA_1D(uint8_t *curr_img, uint8_t *last_img, uint8_t 	numpix, uint16_t scal
 }
 
 
-/*********************************************************************/
-//	IIA_Plus_2D (uint8_t version)
-//	This function computes optical flow between two images curr_img //	and last_img using a simplified version of Mandyam Srinivasan's //	image interpolation algorithm. This algorithm assumes that 
-//	displacements are generally on the order of one pixel or less. 
-//
-//	Credit- Thanks to "A.J." on Embedded Eye for optimizing this 
-//	function.
-//
-//	VARIABLES:
-//	curr_img,last_img: first and second images
-//	numpix: number of pixels in line image
-//	rows: number of rows in image
-//	cols: number of cols in image
-//	scale: value of one pixel of motion (for scaling output)
-//	ofx: pointer to integer value for X shift.
-//	ofy: pointer to integer value for Y shift.
-/*********************************************************************/
-
 void IIA_Plus_2D(uint8_t *curr_img, uint8_t *last_img, uint16_t rows,uint16_t cols, uint16_t scale, int16_t * ofx, int16_t * ofy)
 {
     int32_t  A=0, BD=0, C=0, E=0, F=0;
-    int16_t  F2F1, F4F3, FCF0;
 
     // set up pointers
     uint8_t *f0 = curr_img + cols + 1; //center image
@@ -199,16 +128,15 @@ void IIA_Plus_2D(uint8_t *curr_img, uint8_t *last_img, uint16_t rows,uint16_t co
     uint8_t *f4 = curr_img + 1;		//up-shifted image
     uint8_t *fz = last_img + cols + 1; 	//time-shifted image
 
-
     // loop through
-    for (uint8_t r=1; r<rows-1; ++r) 
-    { 
-        for (uint8_t c=1; c<cols-1; ++c) 
-        { 
+    for (uint8_t r=1; r<rows-1; ++r) { 
+
+        for (uint8_t c=1; c<cols-1; ++c) { 
+
             // compute differentials, then increment pointers 
-            F2F1 = (*(f2++) - *(f1++));
-            F4F3 = (*(f4++) - *(f3++));
-            FCF0 = (*(fz++) - *(f0++));
+            int16_t F2F1 = (*(f2++) - *(f1++));
+            int16_t F4F3 = (*(f4++) - *(f3++));
+            int16_t FCF0 = (*(fz++) - *(f0++));
 
             // update summations
             A += (F2F1 * F2F1);
@@ -241,30 +169,9 @@ void IIA_Plus_2D(uint8_t *curr_img, uint8_t *last_img, uint16_t rows,uint16_t co
 }
 
 
-/*********************************************************************/
-//	IIA_Plus_2D (uint16_t version)
-//	This function computes optical flow between two images curr_img 
-//	and last_img using a simplified version of Mandyam Srinivasan's 
-//	image interpolation algorithm. This algorithm assumes that 
-//	displacements are generally on the order of one pixel or less. 
-//
-//	Credit- Thanks to "A.J." on Embedded Eye for optimizing this 
-//	function.
-//
-//	VARIABLES:
-//	curr_img,last_img: first and second images
-//	numpix: number of pixels in line image
-//	rows: number of rows in image
-//	cols: number of cols in image
-//	scale: value of one pixel of motion (for scaling output)
-//	ofx: pointer to integer value for X shift.
-//	ofy: pointer to integer value for Y shift.
-/*********************************************************************/
-
 void IIA_Plus_2D(uint16_t *curr_img, uint16_t *last_img, uint16_t rows,uint16_t cols, uint16_t scale, int16_t * ofx, int16_t * ofy)
 {
     int32_t  A=0, BD=0, C=0, E=0, F=0;
-    int16_t  F2F1, F4F3, FCF0;
 
     // set up pointers
     uint16_t *f0 = curr_img + cols + 1; //center image
@@ -274,16 +181,14 @@ void IIA_Plus_2D(uint16_t *curr_img, uint16_t *last_img, uint16_t rows,uint16_t 
     uint16_t *f4 = curr_img + 1;		//up-shifted image
     uint16_t *fz = last_img + cols + 1; 	//time-shifted image
 
-
     // loop through
-    for (uint8_t r=1; r<rows-1; ++r) 
-    { 
-        for (uint8_t c=1; c<cols-1; ++c) 
-        { 
+    for (uint8_t r=1; r<rows-1; ++r) { 
+
+        for (uint8_t c=1; c<cols-1; ++c) { 
             // compute differentials, then increment pointers 
-            F2F1 = (*(f2++) - *(f1++));
-            F4F3 = (*(f4++) - *(f3++));
-            FCF0 = (*(fz++) - *(f0++));
+            int16_t F2F1 = (*(f2++) - *(f1++));
+            int16_t F4F3 = (*(f4++) - *(f3++));
+            int16_t FCF0 = (*(fz++) - *(f0++));
 
             // update summations
             A += (F2F1 * F2F1);
@@ -315,28 +220,9 @@ void IIA_Plus_2D(uint16_t *curr_img, uint16_t *last_img, uint16_t rows,uint16_t 
     (*ofy) = (int16_t)YS;
 }
 
-/*********************************************************************/
-//	IIA_Square_2D (uint8_t version)
-//	This function computes optical flow between two images curr_img //	and last_img using a simplified version of Mandyam Srinivasan's //	image interpolation algorithm. This algorithm assumes that 
-//	displacements are generally on the order of one pixel or less. 
-//	Instead of the traditional 'plus'
-//	image shifts (top, bottom, left, right) here we do a more compact
-//	square shift (top right, top left, bottom right, bottom left)
-//
-//	VARIABLES:
-//	curr_img,last_img: first and second images
-//	numpix: number of pixels in line image
-//	rows: number of rows in image
-//	cols: number of cols in image
-//	scale: value of one pixel of motion (for scaling output)
-//	ofx: pointer to integer value for X shift.
-//	ofy: pointer to integer value for Y shift.
-/*********************************************************************/
-
 void IIA_Square_2D(uint8_t *curr_img, uint8_t *last_img, uint16_t rows,uint16_t cols, uint16_t scale, int16_t * ofx, int16_t * ofy)
 {
     int32_t  A=0, BD=0, C=0, E=0, F=0;
-    int16_t  F2F1, F4F3, FCF0;
 
     // set up pointers
     uint8_t *f0 = curr_img;//top left 
@@ -346,14 +232,14 @@ void IIA_Square_2D(uint8_t *curr_img, uint8_t *last_img, uint16_t rows,uint16_t 
     uint8_t *fz = last_img; 		//top left time-shifted
 
     // loop through
-    for (uint8_t r=0; r<rows-1; ++r) 
-    { 
-        for (uint8_t c=0; c<cols-1; ++c) 
-        { 
+    for (uint8_t r=0; r<rows-1; ++r) { 
+
+        for (uint8_t c=0; c<cols-1; ++c) { 
+
             // compute differentials
-            F2F1 = ((*(f0) - *(f1)) + (*(f2) - *(f3))) ;
-            F4F3 = ((*(f0) - *(f2)) + (*(f1) - *(f3))) ;
-            FCF0 = (*(fz) - *(f0));
+            int16_t F2F1 = ((*(f0) - *(f1)) + (*(f2) - *(f3))) ;
+            int16_t F4F3 = ((*(f0) - *(f2)) + (*(f1) - *(f3))) ;
+            int16_t FCF0 = (*(fz) - *(f0));
 
             //increment pointers
             f0++;
@@ -392,30 +278,9 @@ void IIA_Square_2D(uint8_t *curr_img, uint8_t *last_img, uint16_t rows,uint16_t 
     (*ofy) = (int16_t)YS;
 }
 
-/*********************************************************************/
-//	IIA_Square_2D (uint16_t version)
-//	This function computes optical flow between two images curr_img 
-//	and last_img using a simplified version of Mandyam Srinivasan's 
-//	image interpolation algorithm. This algorithm assumes that 
-//	displacements are generally on the order of one pixel or less. 
-//	Instead of the traditional 'plus'
-//	image shifts (top, bottom, left, right) here we do a more compact
-//	square shift (top right, top left, bottom right, bottom left)
-//
-//	VARIABLES:
-//	curr_img,last_img: first and second images
-//	numpix: number of pixels in line image
-//	rows: number of rows in image
-//	cols: number of cols in image
-//	scale: value of one pixel of motion (for scaling output)
-//	ofx: pointer to integer value for X shift.
-//	ofy: pointer to integer value for Y shift.
-/*********************************************************************/
-
 void IIA_Square_2D(uint16_t *curr_img,uint16_t *last_img, uint16_t rows,uint16_t cols, uint16_t scale, int16_t * ofx, int16_t * ofy)
 {
     int32_t  A=0, BD=0, C=0, E=0, F=0;
-    int16_t  F2F1, F4F3, FCF0;
 
     // set up pointers
     uint16_t *f0 = curr_img;//top left 
@@ -425,14 +290,14 @@ void IIA_Square_2D(uint16_t *curr_img,uint16_t *last_img, uint16_t rows,uint16_t
     uint16_t *fz = last_img; 		//top left time-shifted
 
     // loop through
-    for (uint8_t r=0; r<rows-1; ++r) 
-    { 
-        for (uint8_t c=0; c<cols-1; ++c) 
-        { 
+    for (uint8_t r=0; r<rows-1; ++r) { 
+
+        for (uint8_t c=0; c<cols-1; ++c) { 
+
             // compute differentials
-            F2F1 = ((*(f0) - *(f1)) + (*(f2) - *(f3))) ;
-            F4F3 = ((*(f0) - *(f2)) + (*(f1) - *(f3))) ;
-            FCF0 = (*(fz) - *(f0));
+            int16_t F2F1 = ((*(f0) - *(f1)) + (*(f2) - *(f3))) ;
+            int16_t F4F3 = ((*(f0) - *(f2)) + (*(f1) - *(f3))) ;
+            int16_t FCF0 = (*(fz) - *(f0));
 
             //increment pointers
             f0++;
@@ -470,23 +335,6 @@ void IIA_Square_2D(uint16_t *curr_img,uint16_t *last_img, uint16_t rows,uint16_t
     (*ofx) = (int16_t)XS;
     (*ofy) = (int16_t)YS;
 }
-
-/*********************************************************************/
-//	LK_Plus_2D (uint8_t version)
-//	This function computes optical flow between two images curr_img 
-//	and last_img using a version of Lucas-Kanade's algorithm
-//	This algorithm assumes that displacements are generally on 
-//	the order of one pixel or less. 
-//
-//	VARIABLES:
-//	curr_img,last_img: first and second images
-//	numpix: number of pixels in line image
-//	rows: number of rows in image
-//	cols: number of cols in image
-//	scale: value of one pixel of motion (for scaling output)
-//	ofx: pointer to integer value for X shift.
-//	ofy: pointer to integer value for Y shift.
-/*********************************************************************/
 
 void LK_Plus_2D(uint8_t *curr_img, uint8_t *last_img, uint16_t rows,uint16_t cols, uint16_t scale, int16_t * ofx, int16_t * ofy)
 {
@@ -503,7 +351,9 @@ void LK_Plus_2D(uint8_t *curr_img, uint8_t *last_img, uint16_t rows,uint16_t col
 
     // loop through
     for (uint8_t r=1; r<rows-1; ++r) { 
+
         for (uint8_t c=1; c<cols-1; ++c) { 
+
             // compute differentials, then increment pointers (post 		// increment)
             F2F1 = (*(f2++) - *(f1++));	//horizontal differential
             F4F3 = (*(f4++) - *(f3++));	//vertical differential
@@ -536,23 +386,6 @@ void LK_Plus_2D(uint8_t *curr_img, uint8_t *last_img, uint16_t rows,uint16_t col
     (*ofx) = (int16_t)XS;
     (*ofy) = (int16_t)YS;
 }
-
-/*********************************************************************/
-//	LK_Plus_2D (uint16_t version)
-//	This function computes optical flow between two images curr_img 
-//	and last_img using a version of Lucas-Kanade's algorithm
-//	This algorithm assumes that displacements are generally on 
-//	the order of one pixel or less. 
-//
-//	VARIABLES:
-//	curr_img,last_img: first and second images
-//	numpix: number of pixels in line image
-//	rows: number of rows in image
-//	cols: number of cols in image
-//	scale: value of one pixel of motion (for scaling output)
-//	ofx: pointer to integer value for X shift.
-//	ofy: pointer to integer value for Y shift.
-/*********************************************************************/
 
 void LK_Plus_2D(uint16_t *curr_img, uint16_t *last_img, uint16_t rows,uint16_t cols, uint16_t scale, int16_t * ofx, int16_t * ofy)
 {
@@ -603,29 +436,9 @@ void LK_Plus_2D(uint16_t *curr_img, uint16_t *last_img, uint16_t rows,uint16_t c
     (*ofy) = (int16_t)YS;
 }
 
-/*********************************************************************/
-//	LK_Square_2D (uint8_t version)
-//	This function computes optical flow between two images curr_img 
-//	and last_img using a version of Lucas-Kanade's algorithm
-//	This algorithm assumes that displacements are generally on 
-//	the order of one pixel or less. Instead of the traditional 'plus'
-//	image shifts (top, bottom, left, right) here we do a more compact
-//	square shift (two right minus left, two top minus bottom)
-//
-//	VARIABLES:
-//	curr_img,last_img: first and second images
-//	numpix: number of pixels in line image
-//	rows: number of rows in image
-//	cols: number of cols in image
-//	scale: value of one pixel of motion (for scaling output)
-//	ofx: pointer to integer value for X shift.
-//	ofy: pointer to integer value for Y shift.
-/*********************************************************************/
-
 void LK_Square_2D(uint8_t *curr_img, uint8_t *last_img, uint16_t rows,uint16_t cols, uint16_t scale, int16_t * ofx, int16_t * ofy)
 {
     int32_t  A11=0, A12=0, A22=0, b1=0, b2=0;
-    int16_t  F2F1, F4F3, FCF0;
 
     // set up pointers
     uint8_t *f0 = curr_img;//top left 
@@ -635,14 +448,14 @@ void LK_Square_2D(uint8_t *curr_img, uint8_t *last_img, uint16_t rows,uint16_t c
     uint8_t *fz = last_img; 		//top left time-shifted
 
     // loop through
-    for (uint8_t r=0; r<rows-1; ++r) 
-    { 
-        for (uint8_t c=0; c<cols-1; ++c) 
-        { 
+    for (uint8_t r=0; r<rows-1; ++r) { 
+
+        for (uint8_t c=0; c<cols-1; ++c) { 
+
             // compute differentials      
-            F2F1 = ((*(f0) - *(f1)) + (*(f2) - *(f3))) ;
-            F4F3 = ((*(f0) - *(f2)) + (*(f1) - *(f3))) ;
-            FCF0 = (*(fz) - *(f0));
+            int16_t F2F1 = ((*(f0) - *(f1)) + (*(f2) - *(f3))) ;
+            int16_t F4F3 = ((*(f0) - *(f2)) + (*(f1) - *(f3))) ;
+            int16_t FCF0 = (*(fz) - *(f0));
 
             //increment pointers
             f0++;
@@ -680,29 +493,9 @@ void LK_Square_2D(uint8_t *curr_img, uint8_t *last_img, uint16_t rows,uint16_t c
     (*ofy) = (int16_t)YS;
 }
 
-/*********************************************************************/
-//	LK_Square_2D (uint16_t version)
-//	This function computes optical flow between two images curr_img 
-//	and last_img using a version of Lucas-Kanade's algorithm
-//	This algorithm assumes that displacements are generally on 
-//	the order of one pixel or less. Instead of the traditional 'plus'
-//	image shifts (top, bottom, left, right) here we do a more compact
-//	square shift (top right, top left, bottom right, bottom left)
-//
-//	VARIABLES:
-//	curr_img,last_img: first and second images
-//	numpix: number of pixels in line image
-//	rows: number of rows in image
-//	cols: number of cols in image
-//	scale: value of one pixel of motion (for scaling output)
-//	ofx: pointer to integer value for X shift.
-//	ofy: pointer to integer value for Y shift.
-/*********************************************************************/
-
 void LK_Square_2D(uint16_t *curr_img, uint16_t *last_img, uint16_t rows, uint16_t cols, uint16_t scale, int16_t * ofx, int16_t * ofy)
 {
     int32_t  A11=0, A12=0, A22=0, b1=0, b2=0;
-    int16_t  F2F1, F4F3, FCF0;
 
     // set up pointers
     uint16_t *f0 = curr_img;//top left 
@@ -713,14 +506,14 @@ void LK_Square_2D(uint16_t *curr_img, uint16_t *last_img, uint16_t rows, uint16_
 
 
     // loop through
-    for (uint8_t r=0; r<rows-1; ++r) 
-    { 
-        for (uint8_t c=0; c<cols-1; ++c) 
-        { 
+    for (uint8_t r=0; r<rows-1; ++r) { 
+
+        for (uint8_t c=0; c<cols-1; ++c) { 
+
             // compute differentials
-            F2F1 = (*(f0) - *(f1)) + (*(f2) - *(f3))  ;
-            F4F3 = (*(f0) - *(f2)) + (*(f1) - *(f3))  ;
-            FCF0 = (*(fz) - *(f0));
+            int16_t F2F1 = (*(f0) - *(f1)) + (*(f2) - *(f3))  ;
+            int16_t F4F3 = (*(f0) - *(f2)) + (*(f1) - *(f3))  ;
+            int16_t FCF0 = (*(fz) - *(f0));
 
             //increment pointers
             f0++;
