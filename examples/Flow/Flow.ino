@@ -249,7 +249,7 @@ void loop()
 
     //copy current_img to last_img so two frames are kept
     //for optical flow calculation
-    ImgShortCopy(current_img,last_img,row*col);
+    imgCopy(current_img,last_img,row*col);
 
     //small delay
     delay(5);

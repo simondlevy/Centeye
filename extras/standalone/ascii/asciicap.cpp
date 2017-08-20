@@ -50,7 +50,7 @@ int main(int argc, char** argv)
         }
 
         // Dump image as ASCII
-        ImgShortDumpAsciiSerial(shortimage, H, W, 0, 255);
+        imgDumpAscii(shortimage, H, W, 0, 255);
     }
 
     // The camera will be deinitialized automatically in VideoCapture destructor
